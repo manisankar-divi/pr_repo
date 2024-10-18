@@ -1,3 +1,3 @@
-module my-go-project // Use a local module name
+module go-project // Use a local module name
 
-go 1.23.2
+go 1.23
