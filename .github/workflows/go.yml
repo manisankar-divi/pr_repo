@@ -31,6 +31,12 @@ jobs:
         run: ls -la
       - name: Change directory
         run: cd /home/runner/work/go-project
+      - name: List Directory Contents
+        run: ls -la
+      - name: Change directory
+        run: cd /home/runner/work/go-project/go-project
+      - name: List Directory Contents
+        run: ls -la
         
       - name: Build Go Application
         working-directory: ${{ github.workspace }}
