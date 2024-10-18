@@ -24,17 +24,19 @@ jobs:
         with:
           go-version: 1.23.2  # Change to your Go version
         
-
-      - name: Go Mod Download
+      - name: Install Dependencies
         run: |
-          cd $GITHUB_WORKSPACE  # Ensure we're in the workspace directory
+          go mod tidy
           go mod download
         
       - name: Build Go Application
         run: |
-          cd $GITHUB_WORKSPACE  # Ensure we're in the workspace directory
           go build -o app ./main.go
         
+      - name: Run Tests
+        run: |
+          go test ./...
+
       - name: Upload Code Artifact
         uses: actions/upload-artifact@v3
         with:
