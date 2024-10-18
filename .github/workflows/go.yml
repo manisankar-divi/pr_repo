@@ -18,11 +18,8 @@ jobs:
         with:
           go-version: 1.23.2
 
-      - name: Create Build Directory
-        run: mkdir -p build  # Create 'build' directory for the output
-
       - name: Build Go Application
-        run: go build -o build/app ./main.go  # Build binary and place it in 'build' directory
+        run: go build -o ./main.go  # Build binary and place it in 'build' directory
 
       - name: List Files After Build
         run: |
@@ -36,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-binary
-          path: build/app  # Upload binary from 'build' directory
+          path: ./  # Upload binary from 'build' directory
