@@ -37,11 +37,17 @@ jobs:
         run: cd /home/runner/work/go-project/go-project
       - name: List Directory Contents
         run: ls -la
-        
+
+      - name: Install dependencies (will fail if directory is wrong)
+        run: |
+          
+          pwd  # Print the directory again for confirmation
+          ls   # List contents to ensure go.mod is present
+          go mod tidy
       - name: Build Go Application
         working-directory: ${{ github.workspace }}
         run: |
-          go build -o app ./main.go
+          go build -o ./main.go
 
       - name: Run Tests
         run: |
