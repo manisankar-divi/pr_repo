@@ -23,8 +23,13 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.23.2  # Change to your Go version
-        
-        
+          
+      - name: Check Current Directory
+        run: pwd
+
+      - name: List Directory Contents
+        run: ls -la
+
       - name: Build Go Application
         run: |
           go build -o app ./main.go
