@@ -29,11 +29,12 @@ jobs:
 
       - name: List Directory Contents
         run: ls -la
-
+        
       - name: Build Go Application
+        working-directory: ${{ github.workspace }}
         run: |
           go build -o app ./main.go
-        
+
       - name: Run Tests
         run: |
           go test ./...
