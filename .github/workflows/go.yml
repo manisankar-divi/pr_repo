@@ -7,42 +7,43 @@ on:
     branches: [ "main" ]
 
 jobs:
-  ci-cd:
-    name: CI/CD Pipeline
+  build-code:
+    name: Build Code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+      - name: Print Working Directory and List Files (After Checkout)
+        run: pwd && ls -la
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.23.2  # Change to your Go version
+      - name: Print Working Directory and List Files (After Setup Go)
+        run: pwd && ls -la
 
-      - name: Build, Test, and Install Dependencies
+      - name: Install dependencies
         run: |
-          pwd
-          ls -la
           go mod tidy
-          go build -o app ./main.go
-          go test ./...
+          go mod download
+      - name: Print Working Directory and List Files (After Installing Dependencies)
+        run: pwd && ls -la
 
-      - name: Check for dist directory and upload artifacts
-        if: success() # Only run if previous steps were successful
-        run: |
-          if [ -d "dist" ]; then
-            echo "Uploading artifacts from dist directory..."
-            echo "This will upload all files except markdown files."
-            echo "Note: Use actions/upload-artifact to upload your artifacts."
-          else
-            echo "No dist directory found. Skipping artifact upload."
-          fi
+      - name: Build Go Application
+        run: go build -o app ./main.go
+      - name: Print Working Directory and List Files (After Build)
+        run: pwd && ls -la
+
+      - name: Run Tests
+        run: go test ./...
+      - name: Print Working Directory and List Files (After Tests)
+        run: pwd && ls -la
 
       - name: Upload Code Artifact
-        if: success() && startsWith(steps.check-for-dist.outputs.message, 'Uploading artifacts')
         uses: actions/upload-artifact@v4
         with:
-          name: dist-without-markdown
-          path: |
-            dist
-            !dist/**/*.md
+          name: app-binary
+          path: ./app
+      - name: Print Working Directory and List Files (After Artifact Upload)
+        run: pwd && ls -la
