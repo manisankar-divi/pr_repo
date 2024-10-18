@@ -8,42 +8,32 @@ on:
 
 jobs:
   build-code:
-    name: Build Code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Print Working Directory and List Files (After Checkout)
-        run: pwd && ls -la
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.23.2  # Change to your Go version
-      - name: Print Working Directory and List Files (After Setup Go)
-        run: pwd && ls -la
+          go-version: 1.23.2
 
-      - name: Install dependencies
-        run: |
-          go mod tidy
-          go mod download
-      - name: Print Working Directory and List Files (After Installing Dependencies)
-        run: pwd && ls -la
+      - name: Create Build Directory
+        run: mkdir -p build  # Create 'build' directory for the output
 
       - name: Build Go Application
-        run: go build -o app ./main.go
-      - name: Print Working Directory and List Files (After Build)
-        run: pwd && ls -la
+        run: go build -o build/app ./main.go  # Build binary and place it in 'build' directory
+
+      - name: List Files After Build
+        run: |
+          pwd
+          ls -la build  # List files in the 'build' directory
 
       - name: Run Tests
         run: go test ./...
-      - name: Print Working Directory and List Files (After Tests)
-        run: pwd && ls -la
 
       - name: Upload Code Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: app-binary
-          path: ./app
-      - name: Print Working Directory and List Files (After Artifact Upload)
-        run: pwd && ls -la
+          path: build/app  # Upload binary from 'build' directory
