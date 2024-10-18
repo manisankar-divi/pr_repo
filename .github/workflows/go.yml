@@ -24,8 +24,8 @@ jobs:
       - name: List Files After Build
         run: |
           pwd
-          ls -la build  # List files in the 'build' directory
-
+          ls -la 
+          
       - name: Run Tests
         run: go test ./...
 
@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-binary
-          path: ./  # Upload binary from 'build' directory
+          path: .  # Upload binary from 'build' directory
