@@ -37,8 +37,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=your_project_key 
-            -Dsonar.organization=your_organization  
+            -Dsonar.projectKey=Soubarniya_ci-cd
+            -Dsonar.organization=soubarniya
             -Dsonar.sources=.
             -Dsonar.go.coverageReportPath=coverage.out  
 
