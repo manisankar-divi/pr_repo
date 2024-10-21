@@ -50,6 +50,6 @@ jobs:
           path: artifact.zip
           
       - name: List files
-        run: pwd && ls -la && du -m artifact.zip
+        run: pwd && ls -lh 
 
  
