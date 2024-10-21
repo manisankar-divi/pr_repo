@@ -37,19 +37,20 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=Soubarniya_ci-cd  
-            -Dsonar.organization=soubarniya
+            -Dsonar.projectKey=your_project_key 
+            -Dsonar.organization=your_organization  
             -Dsonar.sources=.
             -Dsonar.go.coverageReportPath=coverage.out  
 
-      # Step 6: Check Quality Gate
+      # Step 6: Wait for analysis to complete
       - name: Wait for analysis to complete
         run: sleep 15  # Allow time for analysis to complete
 
+      # Step 7: Check Quality Gate
       - name: Check Quality Gate
         run: |
           RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
           
           echo "Response: $RESPONSE"
           
@@ -66,10 +67,28 @@ jobs:
             echo "$CONDITIONS"
           fi
 
-      # Step 7: Build the application
+      # Step 8: Check Code Coverage
+      - name: Check Code Coverage
+        run: |
+          COVERAGE_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
+            "https://sonarcloud.io/api/measures/component?component=Soubarniya_ci-cd&metricKeys=coverage")  # Replace with your project key
+          
+          echo "Coverage Response: $COVERAGE_RESPONSE"
+          
+          COVERAGE=$(echo "$COVERAGE_RESPONSE" | jq -r '.component.measures[0].value')
+          
+          echo "Code Coverage: $COVERAGE%"
+          
+          # Optional: You can set a threshold for coverage
+          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+            echo "Code coverage is below the threshold!"
+            exit 1
+          fi
+
+      # Step 9: Build the application
       - name: Build the application
         run: go build -o app-binary main.go  # Specify the output binary name
 
-      # Step 8: List files
+      # Step 10: List files (optional)
       - name: List files
         run: pwd && ls -lh 
