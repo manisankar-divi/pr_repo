@@ -56,7 +56,7 @@ jobs:
 
       # Step 5: Build the application
       - name: Build the application
-        run: go build -o main.go
+        run: go build  main.go
 
       # Step 6: Upload build artifacts
       # - name: Upload build artifacts
