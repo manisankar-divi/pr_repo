@@ -71,19 +71,33 @@ jobs:
       - name: Check Code Coverage
         run: |
           COVERAGE_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/measures/component?component=Soubarniya_ci-cd&metricKeys=coverage")  # Replace with your project key
-          
+            "https://sonarcloud.io/api/measures/component?component=Soubarniya_ci-cd&metricKeys=coverage")
+      
           echo "Coverage Response: $COVERAGE_RESPONSE"
-          
+      
+          # Check if the response contains an error
+          if echo "$COVERAGE_RESPONSE" | grep -q '"error":'; then
+            echo "Error in response: $COVERAGE_RESPONSE"
+            exit 1
+          fi
+      
+          # Extract the coverage value
           COVERAGE=$(echo "$COVERAGE_RESPONSE" | jq -r '.component.measures[0].value')
-          
+      
+          # Check if COVERAGE is null or empty
+          if [ -z "$COVERAGE" ] || [ "$COVERAGE" == "null" ]; then
+            echo "No coverage data found."
+            exit 1
+          fi
+      
           echo "Code Coverage: $COVERAGE%"
-          
+      
           # Optional: You can set a threshold for coverage
-          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
             echo "Code coverage is below the threshold!"
             exit 1
           fi
+
 
       # Step 9: Build the application
       - name: Build the application
