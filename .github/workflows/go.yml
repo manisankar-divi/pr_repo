@@ -37,10 +37,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=Soubarniya_ci-cd  # Replace with your SonarCloud project key
-            -Dsonar.organization=soubarniya  # Replace with your organization name
+            -Dsonar.projectKey=Soubarniya_ci-cd  
+            -Dsonar.organization=soubarniya 
             -Dsonar.sources=.
-            -Dsonar.go.coverageReportPath=coverage.out  # Path to the coverage report
+            -Dsonar.go.coverageReportPath=coverage.out  
 
       # Step 6: Check Quality Gate
       - name: Wait for analysis to complete
