@@ -2,35 +2,58 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main  # Trigger on push to 'mani' branch
 
 jobs:
-  build-code:
+  # Step 1: Checkout code
+  checkout:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Go
+  # Step 2: SonarQube scan
+  sonarqube:
+    runs-on: ubuntu-latest
+    needs: checkout  # Depends on the 'checkout' job
+    steps:
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  # Step 3: Build the application
+  build:
+    runs-on: ubuntu-latest
+    needs: checkout  # Can run after checkout, independent of SonarQube
+    steps:
+      - name: Set up Go environment
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23.2
+          go-version: '1.23.2'
 
-      - name: Build Go Application
-        run: go build -o app ./main.go  # Build binary and place it in 'build' directory
+      - name: Build the application
+        run: go build -o app-binary main.go
 
-      - name: List Files After Build
+  # Step 4: Build Docker image
+  docker_build:
+    runs-on: ubuntu-latest
+    needs: build  # Run after the build job completes
+    steps:
+      - name: Docker Build
         run: |
-          pwd
-          ls -la 
-          
-      - name: Run Tests
-        run: go test ./...
+          docker build -t my-app:latest .
 
-      - name: Upload Code Artifact
-        uses: actions/upload-artifact@v4
+  # Step 5: Trivy vulnerability scan
+  trivy_scan:
+    runs-on: ubuntu-latest
+    needs: docker_build  # Run after Docker build completes
+    steps:
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
         with:
-          name: app-binary
-          path: app  # Upload binary from 'build' directory
+          image-ref: 'my-app:latest'
