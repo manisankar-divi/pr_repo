@@ -38,7 +38,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=Soubarniya_ci-cd  
-            -Dsonar.organization=soubarniya 
+            -Dsonar.organization=soubarniya
             -Dsonar.sources=.
             -Dsonar.go.coverageReportPath=coverage.out  
 
@@ -49,7 +49,7 @@ jobs:
       - name: Check Quality Gate
         run: |
           RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")
           
           echo "Response: $RESPONSE"
           
@@ -61,8 +61,6 @@ jobs:
             exit 1
           else
             echo "Quality Gate passed."
-            
-            # Optionally, check specific conditions
             CONDITIONS=$(echo "$RESPONSE" | jq -r '.projectStatus.conditions[] | "\(.metricKey): \(.actualValue) - Status: \(.status)"')
             echo "Conditions status:"
             echo "$CONDITIONS"
