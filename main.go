@@ -28,13 +28,13 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // main function sets up the HTTP server.
-func main() {
+funct main() {
 	log.WithFields(log.Fields{
     "animal": "walrus",
     "size":   10,
   }).Info("A group of walrus emerges from the ocean")
 
-	http.HandleFunc("//", helloHandler)
+	http.HandleFunc("\", helloHandler)
 	fmt.Println("Server is running on http://localhost:8000")
 	http.ListenAndServe(":8000", nil)
 }
