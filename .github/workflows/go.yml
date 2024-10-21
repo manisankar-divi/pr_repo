@@ -70,7 +70,7 @@ jobs:
           name: app-binary
 
       - name: List files
-        run: pwd && ls -l
+        run: pwd && ls -l && cd app-binary && ls -la
 
   # # Step 5: Docker Build (runs after the Artifact job)
   # docker_build:
