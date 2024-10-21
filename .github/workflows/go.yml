@@ -37,8 +37,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=your_project_key  # Replace with your SonarCloud project key
-            -Dsonar.organization=your_organization  # Replace with your organization name
+            -Dsonar.projectKey=Soubarniya_ci-cd  # Replace with your SonarCloud project key
+            -Dsonar.organization=soubarniya  # Replace with your organization name
             -Dsonar.sources=.
             -Dsonar.go.coverageReportPath=coverage.out  # Path to the coverage report
 
@@ -49,7 +49,7 @@ jobs:
       - name: Check Quality Gate
         run: |
           RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=your_project_key")  # Replace with your project key
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
           
           echo "Response: $RESPONSE"
           
