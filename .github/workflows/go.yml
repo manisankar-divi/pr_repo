@@ -8,6 +8,7 @@ on:
 jobs:
   build_and_scan:
     runs-on: ubuntu-latest
+
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -15,28 +16,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Step 2: SonarCloud Scan
+      # Step 2: Set up Go environment
+      - name: Set up Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.2'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: go mod tidy
+
+      # Step 4: Run tests with coverage
+      - name: Run tests with coverage
+        run: go test -coverprofile=coverage.out ./...
+
+      # Step 5: SonarCloud Scan
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v3.1.0  
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=your_project_key  # Replace with your SonarCloud project key
+            -Dsonar.organization=your_organization  # Replace with your organization name
+            -Dsonar.sources=.
+            -Dsonar.go.coverageReportPath=coverage.out  # Path to the coverage report
 
-      # Step 3: Check Quality Gate
+      # Step 6: Check Quality Gate
       - name: Wait for analysis to complete
-        run: sleep 15
-        
-      - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./...
-        
-      - name: Display Coverage Report
-        run: go tool cover -func=coverage.out
+        run: sleep 15  # Allow time for analysis to complete
 
-      # Step: Check Quality Gate
       - name: Check Quality Gate
         run: |
           RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")
-      
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=your_project_key")  # Replace with your project key
+          
           echo "Response: $RESPONSE"
           
           STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
@@ -54,24 +68,10 @@ jobs:
             echo "$CONDITIONS"
           fi
 
-      # Step 4: Set up Go environment
-      - name: Set up Go environment
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23.2'
-
-      # Step 5: Build the application
+      # Step 7: Build the application
       - name: Build the application
-        run: go build ./main.go
+        run: go build -o app-binary main.go  # Specify the output binary name
 
-      # Step 6: Upload build artifacts
-      # - name: Upload build artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: artifacts
-      #     path: artifact.zip
-          
+      # Step 8: List files
       - name: List files
         run: pwd && ls -lh 
-
- 
