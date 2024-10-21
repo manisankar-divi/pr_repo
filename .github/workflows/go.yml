@@ -22,10 +22,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Step 3: Check Quality Gate
+      - name: Wait for analysis to complete
+        run: sleep 15
       - name: Check Quality Gate
         run: |
           STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd" | jq -r .projectStatus.status)
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=your_project_key" | jq -r .projectStatus.status)
           
           if [ "$STATUS" != "OK" ]; then
             echo "Quality Gate failed: $STATUS"
