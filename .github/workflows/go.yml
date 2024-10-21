@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-binary
-          path: .  # Upload binary from 'build' directory
+          path: /go-project  # Upload binary from 'build' directory
