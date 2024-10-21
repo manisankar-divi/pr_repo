@@ -24,6 +24,9 @@ jobs:
       # Step 3: Check Quality Gate
       - name: Wait for analysis to complete
         run: sleep 15
+        
+      - name: Run tests with coverage
+        run: go test -coverprofile=coverage.out ./...
 
       # Step: Check Quality Gate
       - name: Check Quality Gate
