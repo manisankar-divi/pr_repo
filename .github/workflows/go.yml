@@ -26,9 +26,9 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      # # Step 4: Run tests with coverage
-      # - name: Run tests with coverage
-      #   run: go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out
+      # Step 4: Run tests with coverage
+      - name: Run tests with coverage
+        run: go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out
 
       # Step 5: SonarCloud Scan
       - name: SonarCloud Scan
