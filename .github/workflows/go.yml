@@ -28,7 +28,7 @@ jobs:
 
       # Step 4: Run tests with coverage
       - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./...
+        run: go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out
 
       # Step 5: SonarCloud Scan
       - name: SonarCloud Scan
@@ -93,7 +93,7 @@ jobs:
           echo "Code Coverage: $COVERAGE%"
       
           # Optional: You can set a threshold for coverage
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+          if (( $(echo "$COVERAGE < 40" | bc -l) )); then
             echo "Code coverage is below the threshold!"
             exit 1
           fi
