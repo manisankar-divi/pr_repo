@@ -101,4 +101,4 @@ jobs:
 
       # Step 10: List files (optional)
       - name: List files
-        run: pwd && ls -lh 
+        run: pwd && ls -lh && tree
