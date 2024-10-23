@@ -50,7 +50,7 @@ jobs:
       - name: Check Quality Gate
         run: |
           # Make sure to replace *** with your actual SonarCloud token
-            RESPONSE=$(curl -s -H "Authorization: ***" \
+            RESPONSE=$(curl -s -H "Authorization: f0e9254fedbd611f2075783e3e851797476d0a27" \
               "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
             
             echo "Response: $RESPONSE"
