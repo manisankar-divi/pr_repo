@@ -34,7 +34,7 @@ func main() {
     "size":   10,
   }).Info("A group of walrus emerges from the ocean")
 
-	http.HandleFunc("\", helloHandler)
+	http.HandleFunc("/", helloHandler)
 	fmt.Println("Server is running on http://localhost:8000")
 	http.ListenAndServe(":8000", nil)
 }
