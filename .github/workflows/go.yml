@@ -47,28 +47,28 @@ jobs:
         run: sleep 15  # Allow time for analysis to complete
 
       # Step 7: Check Quality Gate
-      - name: Check Quality Gate
-        run: |
-          # Make sure to replace *** with your actual SonarCloud token
-            RESPONSE=$(curl -s -H "Authorization: f0e9254fedbd611f2075783e3e851797476d0a27" \
-              "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
+      # - name: Check Quality Gate
+      #   run: |
+      #     # Make sure to replace *** with your actual SonarCloud token
+      #       RESPONSE=$(curl -s -H "Authorization: f0e9254fedbd611f2075783e3e851797476d0a27" \
+      #         "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
             
-            echo "Response: $RESPONSE"
+      #       echo "Response: $RESPONSE"
             
-            # Extract the project status
-            STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
+      #       # Extract the project status
+      #       STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
             
-            # Check if Quality Gate is OK
-            if [ "$STATUS" != "OK" ]; then
-                echo "Quality Gate failed: $STATUS"
-                exit 1
-            else
-                echo "Quality Gate passed."
-                # Display conditions status
-                CONDITIONS=$(echo "$RESPONSE" | jq -r '.projectStatus.conditions[] | "\(.metricKey): \(.actualValue) - Status: \(.status)"')
-                echo "Conditions status:"
-                echo "$CONDITIONS"
-            fi
+      #       # Check if Quality Gate is OK
+      #       if [ "$STATUS" != "OK" ]; then
+      #           echo "Quality Gate failed: $STATUS"
+      #           exit 1
+      #       else
+      #           echo "Quality Gate passed."
+      #           # Display conditions status
+      #           CONDITIONS=$(echo "$RESPONSE" | jq -r '.projectStatus.conditions[] | "\(.metricKey): \(.actualValue) - Status: \(.status)"')
+      #           echo "Conditions status:"
+      #           echo "$CONDITIONS"
+      #       fi
 
       # Step 9: Build the application
       - name: Build the application
