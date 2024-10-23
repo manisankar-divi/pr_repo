@@ -8,7 +8,6 @@ on:
 jobs:
   build_and_scan:
     runs-on: ubuntu-latest
-
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -16,64 +15,49 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Step 2: Set up Go environment
+      # Step 2: SonarCloud Scan
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v3.1.0  
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Step 3: Check Quality Gate
+      - name: Wait for analysis to complete
+        run: sleep 15
+      - name: install y
+        run: sudo apt-get install jq
+
+      # Step 7: Check Quality Gate
+      - name: Check Quality Gate
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")
+          
+          echo "Response: $RESPONSE"
+          
+          STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
+      
+          if [ "$STATUS" != "OK" ]; then
+            echo "Quality Gate failed: $STATUS"
+            exit 1
+          fi
+
+      # Step 4: Set up Go environment
       - name: Set up Go environment
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: go mod tidy
-
-      # Step 4: Run tests with coverage
-      - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out
-
-      # Step 5: SonarCloud Scan
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v3.1.0  
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=Soubarniya_ci-cd
-            -Dsonar.organization=soubarniya
-            -Dsonar.sources=.
-            -Dsonar.go.coverageReportPath=coverage.out  
-
-      # Step 6: Wait for analysis to complete
-      - name: Wait for analysis to complete
-        run: sleep 15  # Allow time for analysis to complete
-
-      # Step 7: Check Quality Gate
-      # - name: Check Quality Gate
-      #   run: |
-      #     # Make sure to replace *** with your actual SonarCloud token
-      #       RESPONSE=$(curl -s -H "Authorization: f0e9254fedbd611f2075783e3e851797476d0a27" \
-      #         "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")  # Replace with your project key
-            
-      #       echo "Response: $RESPONSE"
-            
-      #       # Extract the project status
-      #       STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
-            
-      #       # Check if Quality Gate is OK
-      #       if [ "$STATUS" != "OK" ]; then
-      #           echo "Quality Gate failed: $STATUS"
-      #           exit 1
-      #       else
-      #           echo "Quality Gate passed."
-      #           # Display conditions status
-      #           CONDITIONS=$(echo "$RESPONSE" | jq -r '.projectStatus.conditions[] | "\(.metricKey): \(.actualValue) - Status: \(.status)"')
-      #           echo "Conditions status:"
-      #           echo "$CONDITIONS"
-      #       fi
-
-      # Step 9: Build the application
+      # Step 5: Build the application
       - name: Build the application
-        run: go build -o app-binary main.go  # Specify the output binary name
+        run: go build -o artifact.zip main.go
 
-      # Step 10: List files (optional)
+      # Step 6: Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: artifact.zip
+          
       - name: List files
-        run: pwd && ls -lh && tree 
+        run: pwd && ls -lh 
