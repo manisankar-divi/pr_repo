@@ -8,26 +8,37 @@ import (
 
 // TestHelloHandler tests the helloHandler function.
 func TestHelloHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name     string
+		method   string
+		expected string
+		status   int
+	}{
+		{"Valid Request", "GET", "Hello, World!", http.StatusOK},
+		// You can add more test cases here if needed
 	}
 
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(helloHandler)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest(tt.method, "/", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	handler.ServeHTTP(rr, req)
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(helloHandler)
 
-	// Check the status code
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
+			handler.ServeHTTP(rr, req)
 
-	// Check the response body
-	expected := "Hello, World!" // Update expected output to NOT include newline
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+			// Check the status code
+			if status := rr.Code; status != tt.status {
+				t.Errorf("handler returned wrong status code: got %v want %v", status, tt.status)
+			}
+
+			// Check the response body
+			if rr.Body.String() != tt.expected {
+				t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), tt.expected)
+			}
+		})
 	}
 }
