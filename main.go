@@ -8,33 +8,31 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// init initializes the logger
 func init() {
-  // Log as JSON instead of the default ASCII formatter.
-  log.SetFormatter(&log.JSONFormatter{})
-
-  // Output to stdout instead of the default stderr
-  // Can be any io.Writer, see below for File example
-  log.SetOutput(os.Stdout)
-
-  // Only log the warning severity or above.
-  log.SetLevel(log.WarnLevel)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.WarnLevel)
 }
-
 
 // helloHandler handles HTTP requests to the root URL.
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	// This will return the string without a newline
-	fmt.Fprint(w, "Hello, World!") // Change Fprintln to Fprint
+	fmt.Fprint(w, "Hello, World!")
 }
 
-// main function sets up the HTTP server.
-func main() {
+// startServer starts the HTTP server.
+func startServer() {
 	log.WithFields(log.Fields{
-    "animal": "walrus",
-    "size":   10,
-  }).Info("A group of walrus emerges from the ocean")
+		"animal": "walrus",
+		"size":   10,
+	}).Info("A group of walrus emerges from the ocean")
 
 	http.HandleFunc("/", helloHandler)
 	fmt.Println("Server is running on http://localhost:8000")
 	http.ListenAndServe(":8000", nil)
+}
+
+// main function
+func main() {
+	startServer()
 }
