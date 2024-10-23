@@ -9,31 +9,32 @@ import (
 )
 
 func init() {
-	log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.WarnLevel)
+  // Log as JSON instead of the default ASCII formatter.
+  log.SetFormatter(&log.JSONFormatter{})
+
+  // Output to stdout instead of the default stderr
+  // Can be any io.Writer, see below for File example
+  log.SetOutput(os.Stdout)
+
+  // Only log the warning severity or above.
+  log.SetLevel(log.WarnLevel)
 }
+
 
 // helloHandler handles HTTP requests to the root URL.
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello, World!")
+	// This will return the string without a newline
+	fmt.Fprint(w, "Hello, World!") // Change Fprintln to Fprint
 }
 
-// startServer starts the HTTP server.
-func startServer() {
-	http.HandleFunc("/", helloHandler)
-	fmt.Println("Server is running on http://localhost:8000")
-	if err := http.ListenAndServe(":8000", nil); err != nil {
-		log.Fatal(err)
-	}
-}
-
-// main function sets up the server.
+// main function sets up the HTTP server.
 func main() {
 	log.WithFields(log.Fields{
-		"animal": "walrus",
-		"size":   10,
-	}).Info("A group of walrus emerges from the ocean")
+    "animal": "walrus",
+    "size":   10,
+  }).Info("A group of walrus emerges from the ocean")
 
-	startServer()
+	http.HandleFunc("/", helloHandler)
+	fmt.Println("Server is running on http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
