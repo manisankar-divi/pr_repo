@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// init initializes the logger
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
@@ -22,17 +21,19 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 
 // startServer starts the HTTP server.
 func startServer() {
+	http.HandleFunc("/", helloHandler)
+	fmt.Println("Server is running on http://localhost:8000")
+	if err := http.ListenAndServe(":8000", nil); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// main function sets up the server.
+func main() {
 	log.WithFields(log.Fields{
 		"animal": "walrus",
 		"size":   10,
 	}).Info("A group of walrus emerges from the ocean")
 
-	http.HandleFunc("/", helloHandler)
-	fmt.Println("Server is running on http://localhost:8000")
-	http.ListenAndServe(":8000", nil)
-}
-
-// main function
-func main() {
 	startServer()
 }
