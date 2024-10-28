@@ -10,28 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
+          
       - name: Install dependencies
         run: go get .
+        
       - name: Build
         run: go build -v ./...
+        
       - name: Test with the Go CLI
         run: go test
+        
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/*.sum
+            
       - name: Build the application
         run: go build -o artifact main.go
-      - name: Go Cache
-        run: |
-          cache-dependency-path: "**/*.sum"
-        
-      - name: Build the application
-        uses: actions/upload-artifact@v4
-        with:
-            name: Build
-            path: dist
-
           
       - name: List files
         run: pwd && ls -lh 
