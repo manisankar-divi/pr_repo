@@ -44,10 +44,15 @@ jobs:
           mkdir dist
           go build -o  main.go
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: artifact
           path: dist
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
           
       - name: List files
         run: pwd && ls -lh 
