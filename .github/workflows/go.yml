@@ -12,37 +12,8 @@ jobs:
       # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Step 2: SonarCloud Scan
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v3.1.0  
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Step 3: Check Quality Gate
-      - name: Wait for analysis to complete
-        run: sleep 15
-      - name: install y
-        run: sudo apt-get install jq
-
-      # # Step 7: Check Quality Gate
-      # - name: Check Quality Gate
-      #   run: |
-      #     RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.SONAR_TOKEN }}" \
-      #       "https://sonarcloud.io/api/qualitygates/project_status?projectKey=Soubarniya_ci-cd")
-          
-      #     echo "Response: $RESPONSE"
-          
-      #     STATUS=$(echo "$RESPONSE" | jq -r .projectStatus.status)
-      
-      #     if [ "$STATUS" != "OK" ]; then
-      #       echo "Quality Gate failed: $STATUS"
-      #       exit 1
-      #     fi
-
-      # Step 4: Set up Go environment
+      # Step 2: Set up Go environment
       - name: Set up Go environment
         uses: actions/setup-go@v5
         with:
