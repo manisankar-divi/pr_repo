@@ -23,9 +23,6 @@ jobs:
           go vet .
     
         
-      - name: Build
-        run: go build -v ./...
-        
       - name: Test with the Go CLI
         run: go test
         
@@ -42,8 +39,7 @@ jobs:
       - name: Build the application
         run: |
           mkdir -p dist  # Ensure the dist directory exists
-          go build .
-          #-o dist/main ./...  # Output to dist directory
+          go build -o dist/main ./...  # Output to dist directory
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
