@@ -1,5 +1,5 @@
 # Use the official Go image to build and run the application
-FROM golang-1.23
+FROM golang:1.23
 
 # Set the working directory
 WORKDIR /app
