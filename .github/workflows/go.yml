@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Setup Go
+
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
@@ -26,15 +26,6 @@ jobs:
       - name: Test with the Go CLI
         run: go test
         
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/*.sum
-          key: ${{ runner.os }}-build-${{ github.run_id }}
-          restore-keys: |
-            Linux-build-
-          
       - name: Build the application
         run: |
           mkdir -p dist
@@ -46,14 +37,16 @@ jobs:
           name: artifact
           path: dist
           if-no-files-found: warn
-          compression-level: 6
-          overwrite: false
-          include-hidden-files: false
-          
-      - name: List files
-        run: pwd && ls -lh 
 
-      # Docker Build Steps
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+          severity: 'CRITICAL,HIGH'  # Optional: specify severity levels
+
+      # Additional steps for Docker image build and scanning (if needed)
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -67,26 +60,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+        run: docker build -t docker.io/manisankardivi/my-app:latest .
 
-      - name: Cache Trivy DB
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/.cache/trivy
-          key: trivy-db-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            trivy-db-${{ runner.os }}-
-
-      - name: Run Trivy vulnerability scanner (Image)
+      - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          image-ref: 'docker.io/manisankardivi/my-app:latest'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-
-      - name: Run Trivy full code scan (Local Directory)
-        run: |
-          trivy fs --severity CRITICAL,HIGH ./
