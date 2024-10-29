@@ -90,6 +90,8 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          run: |
+            trivy image ${{'docker.io/manisankardivi/my-go-app:${{ github.sha }}'}}
 
       - name: Push Docker image
         if: success()
