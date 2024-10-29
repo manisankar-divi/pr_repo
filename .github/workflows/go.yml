@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on push to 'main' branch
+      - main
 
 jobs:
   build_and_scan:
@@ -37,8 +37,8 @@ jobs:
           
       - name: Build the application
         run: |
-          mkdir -p dist  # Ensure the dist directory exists
-          go build -o dist/main ./...  # Output to dist directory
+          mkdir -p dist
+          go build -o dist/main ./...
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -67,7 +67,19 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+        run: |
+          docker build -t docker.io/my-organization/my-go-app:${{ github.sha }} .
+          docker images
+          docker ps 
+          docker ps -a
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/trivy
+          key: trivy-db-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            trivy-db-${{ runner.os }}-
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
@@ -80,5 +92,5 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Push Docker image
-        if: success()  # Only push if the Trivy scan was successful
+        if: success()
         run: docker push docker.io/my-organization/my-app:${{ github.sha }}
