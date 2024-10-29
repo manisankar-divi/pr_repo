@@ -86,3 +86,6 @@ jobs:
           name: trivy-report
           path: /tmp/trivy-report.json
           if-no-files-found: warn
+      - run: |
+          ls -la
+          cat /tmp/trivy-report.json
