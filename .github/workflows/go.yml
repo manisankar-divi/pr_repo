@@ -67,11 +67,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: |
-          docker build -t docker.io/manisankardivi/my-go-app:${{ github.sha }} .
-          docker images
-          docker ps 
-          docker ps -a
+        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
 
       - name: Cache Trivy DB
         uses: actions/cache@v4
@@ -81,16 +77,16 @@ jobs:
           restore-keys: |
             trivy-db-${{ runner.os }}-
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner (Image)
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/manisankardivi/my-go-app:${{ github.sha }}'
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'MEDIUM,CRITICAL,HIGH'
+          severity: 'CRITICAL,HIGH'
 
-      - name: Push Docker image
-        if: success()
-        run: docker push docker.io/manisankardivi/my-go-app:${{ github.sha }}
+      - name: Run Trivy full code scan (Local Directory)
+        run: |
+          trivy fs --severity CRITICAL,HIGH ./
