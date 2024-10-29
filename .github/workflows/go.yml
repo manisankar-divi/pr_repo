@@ -38,14 +38,30 @@ jobs:
           path: dist
           if-no-files-found: warn
 
-      # Run Trivy vulnerability scanner with VEX
-      - name: Run Trivy image scanner with VEX
+      # Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Run Trivy image scanner and save report in YAML format
+      - name: Run Trivy image scanner
         run: |
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            ghcr.io/aquasecurity/trivy:0.52.0 \
-            image --vex repo \
-            docker.io/my-organization/my-app:${{ github.sha }}  # Replace with your image
+          for i in {1..5}; do
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              -o /tmp/trivy-report.yaml \
+              ghcr.io/aquasecurity/trivy:0.52.0 \
+              image \
+              --format yaml \
+              --output /tmp/trivy-report.yaml \
+              docker.io/my-organization/my-app:${{ github.sha }} && break || sleep 15
+          done
+
+      # Upload the Trivy report
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: /tmp/trivy-report.yaml
 
       # Additional steps for Docker image build and scanning (if needed)
       - name: Set up QEMU
