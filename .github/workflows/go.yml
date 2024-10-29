@@ -38,13 +38,14 @@ jobs:
           path: dist
           if-no-files-found: warn
 
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          trivy-config: trivy.yaml
-          severity: 'CRITICAL,HIGH'  # Optional: specify severity levels
+      # Run Trivy vulnerability scanner with VEX
+      - name: Run Trivy image scanner with VEX
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            ghcr.io/aquasecurity/trivy:0.52.0 \
+            image --vex repo \
+            docker.io/my-organization/my-app:${{ github.sha }}  # Replace with your image
 
       # Additional steps for Docker image build and scanning (if needed)
       - name: Set up QEMU
@@ -60,12 +61,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t docker.io/manisankardivi/my-app:latest .
+        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/manisankardivi/my-app:latest'
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
