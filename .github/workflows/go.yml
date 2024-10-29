@@ -77,7 +77,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+        run: |
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+          docker images && docker ps && docker ps -a
+          pwd & ls -la
 
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
@@ -85,6 +88,6 @@ jobs:
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
+          ignore-unfixed: false
           vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          severity: 'MEDIUM,CRITICAL,HIGH'
