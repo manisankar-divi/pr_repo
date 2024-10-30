@@ -49,7 +49,7 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: | 
-          docker build -t manisankar/go-app .
+          docker build -t manisankar/go-app:v1 .
           docker images
           docker ps 
           docker ps -a
@@ -67,7 +67,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: 'manisankar/go-app'   # Replace with your actual image reference
+          image-ref: 'manisankar/go-app:v1'   # Replace with your actual image reference
           format: 'table'                  # Output format in table
           output: '/tmp/trivy-report.txt'  # Save report as text
           exit-code: '1'                   # Fail on critical vulnerabilities
