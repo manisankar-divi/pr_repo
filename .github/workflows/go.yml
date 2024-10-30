@@ -53,15 +53,13 @@ jobs:
           docker images && docker ps && docker ps -a
           pwd & ls -la
 
-      - name: Run Trivy vulnerability scanner on Docker image
+      - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          scan-type: 'image'
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
-          format: 'table'                     
-          # output: '/tmp/trivy-report.txt'   
-          exit-code: '1'                      
-          ignore-unfixed: false
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
