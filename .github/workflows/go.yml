@@ -59,7 +59,7 @@ jobs:
           scan-type: 'image'
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'table'                     
-          output: '/tmp/trivy-report.txt'   
+          # output: '/tmp/trivy-report.txt'   
           exit-code: '1'                      
           ignore-unfixed: false
           vuln-type: 'os,library'
