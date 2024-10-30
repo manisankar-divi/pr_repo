@@ -74,8 +74,7 @@ jobs:
 
       - name: Display Trivy report
         run: |
-          cat /tmp/trivy-report.txt 
-      - run: |
           ls -la
-          cat /tmp/trivy-report.html  # Optional: Display the HTML report in logs
+          ls -la /tmp                          # List files in /tmp to verify report location
+          cat /tmp/trivy-report.txt            # Display the table report in logs
 
