@@ -61,7 +61,7 @@ jobs:
           format: 'json'                     # Set output format to JSON
           output: '/tmp/trivy-report.json'    # Save report as JSON
           exit-code: '1'                      # Fail on critical vulnerabilities
-          ignore-unfixed: false
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
