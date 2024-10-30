@@ -67,7 +67,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image: 'docker.io/my-organization/my-app:${{ github.sha }}'  # Replace with your image
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'  # Replace with your image
           format: 'json'
           output: '/tmp/trivy-report.json'  # Save report as JSON
 
