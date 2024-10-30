@@ -48,27 +48,38 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build an image from Dockerfile
-        run: docker build -t manisankar/go-app .
-      - name: Run Trivy vulnerability scanner
+        run: | 
+          docker build -t docker.io/manisankar/go-app .
+          docker images
+          docker ps 
+          docker ps -a
+        
+      - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'manisankar/go-app'
+          image-ref: 'docker.io/manisankar/go-app'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
+          ignore-unfixed: false
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Run Trivy scan
+        id: trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'image'
+          image: 'docker.io/my-organization/my-app:${{ github.sha }}'  # Replace with your image
+          format: 'json'
+          output: '/tmp/trivy-report.json'  # Save report as JSON
 
-      # - name: Upload Trivy report
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: trivy-report
-      #     path: /tmp/trivy-report.txt
-      #     if-no-files-found: warn
-      
-      # - name: View Trivy report
-      #   run: |
-      #     ls -la
-      #     cat /tmp/trivy-report.txt
-               
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: /tmp/trivy-report.json
+          if-no-files-found: warn
+      - run: |
+          ls -la
+          cat /tmp/trivy-report.json
+
 
