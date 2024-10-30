@@ -63,12 +63,13 @@ jobs:
           ignore-unfixed: false
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          
       - name: Run Trivy scan
         id: trivy
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image: 'docker.io/my-organization/my-app:${{ github.sha }}'  # Replace with your image
+          image-ref: 'docker.io/manisankar/go-app'  # Replace with your image
           format: 'json'
           output: '/tmp/trivy-report.json'  # Save report as JSON
 
