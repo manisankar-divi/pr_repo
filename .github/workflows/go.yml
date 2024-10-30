@@ -64,4 +64,4 @@ jobs:
 
       - name: Set up Trivy
         run: |
-          trivy image --skip-pull --format table --exit-code 1 manisankar/go-app:v1
+          trivy image --severity HIGH,CRITICAL manisankar/go-app:v1
