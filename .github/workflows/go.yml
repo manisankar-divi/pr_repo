@@ -51,6 +51,8 @@ jobs:
           docker images
           docker ps 
           docker ps -a
+      - name: Setup Trivy Database
+        run: trivy db pull
         
       - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@0.28.0
