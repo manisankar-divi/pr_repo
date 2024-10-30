@@ -19,10 +19,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          go mod init go-project
-          go get github.com/sirupsen/logrus@v1.9.3
-          go get golang.org/x/sys@v0.0.0-20220715151400-c0bba94af5f8
-          go mod tidy
+          go mod download
           
       - name: Test with the Go CLI
         run: go test
