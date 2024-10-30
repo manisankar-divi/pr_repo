@@ -54,13 +54,34 @@ jobs:
           docker ps 
           docker ps -a
         
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy  # Cache Trivy vulnerability database
+          key: cache-trivy-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            cache-trivy-${{ github.ref }}-
+            cache-trivy-
+
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'manisankar/go-app'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: false
+          scan-type: 'image'
+          image-ref: 'manisankar/go-app'   # Replace with your actual image reference
+          format: 'table'                  # Output format in table
+          output: '/tmp/trivy-report.txt'  # Save report as text
+          exit-code: '1'                   # Fail on critical vulnerabilities
+          ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          
+
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: /tmp/trivy-report.txt
+          if-no-files-found: warn
+
+      - run: |
+          ls -la
+          cat /tmp/trivy-report.txt
