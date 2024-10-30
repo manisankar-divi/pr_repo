@@ -58,9 +58,9 @@ jobs:
         with:
           scan-type: 'image'
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
-          format: 'table'                     # Set output format to table
-          output: '/tmp/trivy-report.txt'     # Save report as text
-          exit-code: '1'                      # Fail on critical vulnerabilities
+          format: 'table'                     
+          output: '/tmp/trivy-report.txt'   
+          exit-code: '1'                      
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
@@ -69,10 +69,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: trivy-report
-          path: /tmp/trivy-report.txt          # Upload the table report
+          path: /tmp/trivy-report.txt
           if-no-files-found: warn
-
-      - name: Display Trivy report
+      
+      - name: View Trivy report
         run: |
-          cat /tmp/trivy-report.txt         
+          ls -la
+          cat /tmp/trivy-report.txt
+               
 
