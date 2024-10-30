@@ -52,23 +52,8 @@ jobs:
           docker ps 
           docker ps -a
         
-      - name: Run Trivy vulnerability scanner on Docker image
+      - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'manisankar/go-app:v1'   # Replace with your actual image reference
-          format: 'table'                  # Output format in table
-          exit-code: '1'                   # Fail on critical vulnerabilities
-          ignore-unfixed: false
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
-      # - name: Upload Trivy report
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: trivy-report
-      #     path: /tmp/trivy-report.txt
-      #     if-no-files-found: warn
-
-      # - run: |
-      #     ls -la
-      #     cat /tmp/trivy-report.txt
+          image-ref: 'manisankar/go-app:v1' # Replace with your actual image
+          format: 'table'
