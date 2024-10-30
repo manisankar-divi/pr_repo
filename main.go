@@ -33,7 +33,6 @@ func main() {
     "animal": "walrus",
     "size":   10,
   }).Info("A group of walrus emerges from the ocean")
-// hello
 
 	http.HandleFunc("/", helloHandler)
 	fmt.Println("Server is running on http://localhost:8080")
