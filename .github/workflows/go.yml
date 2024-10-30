@@ -19,6 +19,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          go mod tidy
           go get .
           go get -u golang.org/x/lint/golint
           go vet .
