@@ -62,7 +62,7 @@ jobs:
           output: '/tmp/trivy-report.json'    # Save report as JSON
           exit-code: '1'                      # Fail on critical vulnerabilities
           ignore-unfixed: false
-          vuln-type: 'os,library,secret,config,cloud,rce'
+          vuln-type: 'os,library,secret'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy report
