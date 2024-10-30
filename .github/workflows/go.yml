@@ -62,3 +62,6 @@ jobs:
           sudo apt-get install trivy
           trivy --version
 
+      - name: Set up Trivy
+        run: |
+          trivy image manisankar/go-app:v1
