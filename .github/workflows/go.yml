@@ -59,9 +59,8 @@ jobs:
         with:
           image-ref: 'manisankar/go-app:v1'   # Replace with your actual image reference
           format: 'table'                  # Output format in table
-          output: '/tmp/trivy-report.txt'  # Save report as text
           exit-code: '1'                   # Fail on critical vulnerabilities
-          ignore-unfixed: true
+          ignore-unfixed: false
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
