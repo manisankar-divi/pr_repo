@@ -45,10 +45,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build an image from Dockerfile
-        run: | 
-          docker build -t manisankardivi/go-app:v3 .
-          docker images
-          docker ps 
-          docker ps -a
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: manisankardivi/go-app:v3
     
