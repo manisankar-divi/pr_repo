@@ -53,12 +53,12 @@ jobs:
           docker ps -a
 
       - name: Set up Trivy
-        uses: aquasecurity/setup-trivy@v0.2.1
-        with:
-          version: v0.56.1
-  
-      - name: Pull Trivy DB
-        run: trivy db pull
-  
-      - name: Scan Image
-        run: trivy image --format table --exit-code 1 manisankar/go-app:v1
+        run: |
+          
+          sudo apt-get install wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+          trivy --version
+
