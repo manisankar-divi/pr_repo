@@ -53,5 +53,4 @@ jobs:
           docker ps -a
 			
       - name: Build Image Push to registry
-        run: |
-          docker push manisankardivi/go-app:v3
+        run: docker push manisankardivi/go-app:v3
