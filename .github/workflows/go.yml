@@ -51,11 +51,14 @@ jobs:
           docker images
           docker ps 
           docker ps -a
-      - name: Setup Trivy Database
-        run: trivy db pull
-        
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@0.28.0
+
+      - name: Set up Trivy
+        uses: aquasecurity/setup-trivy@v0.2.1
         with:
-          image-ref: 'manisankar/go-app:v1' # Replace with your actual image
-          format: 'table'
+          version: v0.56
+  
+      - name: Pull Trivy DB
+        run: trivy db pull
+  
+      - name: Scan Image
+        run: trivy image --format table --exit-code 1 manisankar/go-app:v1
