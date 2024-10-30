@@ -50,4 +50,11 @@ jobs:
         with:
           push: true
           tags: manisankardivi/go-app:v3
-    
+      - name: Upload artifacts
+        run: actions/upload-artifact@v4
+        
+      - name: docker verify
+        run: |
+          docker images
+          docker ps 
+          docker ps -a
