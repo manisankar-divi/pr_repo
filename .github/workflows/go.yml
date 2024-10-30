@@ -53,15 +53,10 @@ jobs:
           docker ps -a
 
       - name: Set up Trivy
+        uses: aquasecurity/trivy-action@0.28.0  # Use the Trivy action to set up Trivy
+        with:
+          version: v0.56.1  # Specify the Trivy version you want
+  
+      - name: Scan Image
         run: |
-          
-          sudo apt-get install wget apt-transport-https gnupg
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy
-          trivy --version
-
-      - name: Set up Trivy
-        run: |
-          trivy image --severity HIGH,CRITICAL manisankar/go-app:v1
+          trivy image --severity HIGH,CRITICAL --format table --exit-code 1 manisankar/go-app:v1
