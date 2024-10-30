@@ -62,6 +62,14 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os'
           severity: 'CRITICAL'
+      - name: Cache Trivy Database
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            trivy-db-${{ runner.os }}-
+
       - name: Run Trivy scan
         id: trivy
         uses: aquasecurity/trivy-action@0.28.0
