@@ -56,28 +56,14 @@ jobs:
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
+          scan-type: 'image'
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
+          format: 'json'                     # Set output format to JSON
+          output: '/tmp/trivy-report.json'    # Save report as JSON
+          exit-code: '1'                      # Fail on critical vulnerabilities
+          ignore-unfixed: false
           vuln-type: 'os'
           severity: 'CRITICAL'
-      - name: Cache Trivy Database
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/trivy
-          key: trivy-db-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            trivy-db-${{ runner.os }}-
-
-      - name: Run Trivy scan
-        id: trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: 'image'
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'  # Replace with your image
-          format: 'json'
-          output: '/tmp/trivy-report.json'  # Save report as JSON
 
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4
