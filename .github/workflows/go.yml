@@ -49,30 +49,30 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+          docker build -t my-app:${{ github.sha }} .
           docker images && docker ps && docker ps -a
           pwd & ls -la
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          image-ref: my-app:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report
-          path: /tmp/trivy-report.txt
-          if-no-files-found: warn
+      # - name: Upload Trivy report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-report
+      #     path: /tmp/trivy-report.txt
+      #     if-no-files-found: warn
       
-      - name: View Trivy report
-        run: |
-          ls -la
-          cat /tmp/trivy-report.txt
+      # - name: View Trivy report
+      #   run: |
+      #     ls -la
+      #     cat /tmp/trivy-report.txt
                
 
