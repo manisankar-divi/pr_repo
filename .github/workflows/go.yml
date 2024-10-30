@@ -55,7 +55,7 @@ jobs:
       - name: Set up Trivy
         uses: aquasecurity/setup-trivy@v0.2.1
         with:
-          version: v0.56
+          version: v0.56.2
   
       - name: Pull Trivy DB
         run: trivy db pull
