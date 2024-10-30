@@ -58,19 +58,21 @@ jobs:
         with:
           scan-type: 'image'
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
-          format: 'json'                     # Set output format to JSON
-          output: '/tmp/trivy-report.json'    # Save report as JSON
+          format: 'html'                     # Set output format to HTML
+          output: '/tmp/trivy-report.html'    # Save report as HTML
           exit-code: '1'                      # Fail on critical vulnerabilities
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-
+      
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4
         with:
           name: trivy-report
-          path: /tmp/trivy-report.json
+          path: /tmp/trivy-report.html  # Upload the HTML report
           if-no-files-found: warn
+      
       - run: |
           ls -la
-          cat /tmp/trivy-report.json
+          cat /tmp/trivy-report.html  # Optional: Display the HTML report in logs
+
