@@ -23,8 +23,8 @@ func init() {
 // hello world from 1
 // helloHandler handles HTTP requests to the root URL.
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	// This will return the string without a newline
-	fmt.Fprint(w, "Hello, World!!") 
+	// This will return the string without.
+	fmt.Fprint(w, "Hello, World!") 
 }
 
 // main function sets up the HTTP server.
