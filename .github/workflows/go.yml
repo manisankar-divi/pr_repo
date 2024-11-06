@@ -34,30 +34,34 @@ jobs:
           name: artifact
           path: dist
           if-no-files-found: warn
+      # Step 3: Build Docker image
+      - name: Build Docker image
+        run: |
+          VERSION=$(git rev-parse --short HEAD)  # Get short commit hash for unique tagging
+          docker build -t manisankardivi/go-sha:latest -t manisankardivi/go-sha:$VERSION .  # Build image with 'latest' and commit hash tags
+          docker images  # Verify the built image
 
+      # Step 4: Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  # Store your Docker Hub username as a secret
+          password: ${{ secrets.DOCKERHUB_TOKEN }}    # Store your Docker Hub token as a secret
 
-      - name: Build Docker image
-        run: |
-          # Get the short commit hash for unique tagging
-          VERSION=$(git rev-parse --short HEAD)  # Short commit hash
-          docker build -t myapp:latest -t myapp:$VERSION .  # Build image with latest and commit hash tags
-
+      # Step 5: Push Docker image to Docker Hub
       - name: Push Docker image
         run: |
           VERSION=$(git rev-parse --short HEAD)  # Get commit hash again for tagging
-          docker push myapp:latest  # Push 'latest' tag
-          docker push myapp:$VERSION  # Push commit hash tag
+          docker push manisankardivi/go-sha:latest  # Push 'latest' tag
+          docker push manisankardivi/go-sha:$VERSION  # Push commit hash tag
           
+      # Step 6: Verify Docker images pushed
       - name: Verify Docker images
         run: |
-          docker images  # Verify images pushed to Docker Hub
+          docker images  # Verify the images pushed to Docker Hub
           docker ps -a  # List all containers
 
+      
   deploy:
     runs-on: self-hosted  
     needs: build_and_scan
