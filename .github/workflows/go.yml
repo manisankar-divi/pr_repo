@@ -47,9 +47,8 @@ jobs:
       - name: Extract version from versions.txt
         id: version
         run: |
-          # Extract version from versions.txt (after 'VERSION: ')
-          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' version.txt)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          version=$(grep -oP 'd+\.\d+\.\d+' VERSION)
+          echo "version=$VERSION" >> $VERSION
           echo "Version extracted: $VERSION"
 
       - name: Build Docker image with extracted version
@@ -76,7 +75,7 @@ jobs:
           # Read the version from the VERSION file
           VERSION=$(cat VERSION)
           echo "Version extracted: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
+          echo "VERSION=$VERSION" >> $VERSION  # Save version to environment variable
 
 
           # Replace the image version in manifest.yaml with the extracted version
