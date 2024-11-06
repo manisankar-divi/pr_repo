@@ -41,16 +41,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: manisankardivi/go-app:v3
+      - name: Build Docker image
+        run: |
+          # Get the short commit hash for unique tagging
+          VERSION=$(git rev-parse --short HEAD)  # Short commit hash
+          docker build -t myapp:latest -t myapp:$VERSION .  # Build image with latest and commit hash tags
 
+      - name: Push Docker image
+        run: |
+          VERSION=$(git rev-parse --short HEAD)  # Get commit hash again for tagging
+          docker push myapp:latest  # Push 'latest' tag
+          docker push myapp:$VERSION  # Push commit hash tag
+          
       - name: Verify Docker images
         run: |
-          docker images
-          docker ps -a
+          docker images  # Verify images pushed to Docker Hub
+          docker ps -a  # List all containers
 
   deploy:
     runs-on: self-hosted  
