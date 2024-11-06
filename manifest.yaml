@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: my-goapp
-          image: manisankardivi:test
+          image: manisankardivi:new
           ports:
             - containerPort: 80
 
