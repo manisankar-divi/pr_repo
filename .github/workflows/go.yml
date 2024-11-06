@@ -57,6 +57,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t manisankardivi/test:${{ env.VERSION }} .
+          docker images
 
       # Login to Docker Hub
       - name: Login to Docker Hub
@@ -68,7 +69,7 @@ jobs:
       # Push the Docker image with the extracted version tag
       - name: Push Docker image
         run: |
-          docker push myapp:${{ env.VERSION }}
+          docker push manisankardivi/test:${{ env.VERSION }}
   
       # Verify Docker images pushed
       - name: Verify Docker images
