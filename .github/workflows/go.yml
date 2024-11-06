@@ -82,3 +82,6 @@ jobs:
 
           # Print the updated manifest.yaml to verify the changes
           cat manifest.yaml
+          # k8s Deploy
+          kubectl apply -f ./manifest.yaml
+          kubectl get all
