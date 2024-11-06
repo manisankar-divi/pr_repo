@@ -43,11 +43,11 @@ jobs:
           echo "Commit Message: $COMMIT_MESSAGE"
           
           # Extract version from the commit message (assuming it's in format "v1.0.1")
-          VERSION=$(echo "$COMMIT_MESSAGE" | grep -oP 'v\d+\.\d+\.\d+')
+          VERSION=$(echo "$COMMIT_MESSAGE" | grep -oP 'v\d+\.\d+\.\d+' || echo "v0.0.0")
           
-          # If version is found, set it as the environment variable, otherwise fallback to a default version
-          if [ -z "$VERSION" ]; then
-            VERSION="v0.0.0"  # Fallback version if no version found in commit message
+          # If no version is found, fallback to default version
+          if [ "$VERSION" == "" ]; then
+            VERSION="v0.0.0"
           fi
           
           echo "Version extracted: $VERSION"
