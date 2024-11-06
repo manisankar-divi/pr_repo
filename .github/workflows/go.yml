@@ -61,24 +61,24 @@ jobs:
           docker push manisankardivi/new:${{ env.VERSION }}
 
 
-  # deploy:
-  #   runs-on: self-hosted
-  #   needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  deploy:
+    runs-on: self-hosted
+    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Check manifest files
-  #       run: ls -la
+      - name: Check manifest files
+        run: ls -la
         
-  #     - name: Replace the placeholder in manifest.yaml with the new version
-  #       run: |
-  #         sed -i "s|\${VERSION}|${{ env.VERSION }}|g" ./manifest.yaml
-  #         cat ./manifest.yaml  # Optional: print to verify the changes
-      
-
-
-      - name: Apply Kubernetes manifest
+      - name: Read version from version.txt and update manifest.yaml
         run: |
-          kubectl apply -f ./manifest.yaml
-          kubectl get all 
+          # Extract the version from version.txt
+          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' version.txt)
+          echo "Version extracted: $VERSION"
+
+          # Replace the image version in manifest.yaml with the extracted version
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
+
+          # Print the updated manifest.yaml to verify the changes
+          cat manifest.yaml
