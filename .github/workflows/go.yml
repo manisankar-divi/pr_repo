@@ -35,13 +35,6 @@ jobs:
           path: dist
           if-no-files-found: warn
           
-      - name: Output Run ID
-        run: echo ${{ github.run_id }}
-      - name: Output Run Number
-        run: echo ${{ github.run_number }}
-      - name: Output Run Attempt
-        run: echo ${{ github.run_attempt }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
