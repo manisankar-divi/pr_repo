@@ -66,7 +66,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   
-      # Push the Docker image with the extracted version
+      # Push the Docker image with the extracted
       - name: Push Docker image
         run: |
           docker push manisankardivi/test:${{ env.VERSION }}
