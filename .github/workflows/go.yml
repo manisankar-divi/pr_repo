@@ -70,11 +70,11 @@ jobs:
       - name: Check manifest files
         run: ls -la
         
-      - name: Update Kubernetes manifest with the new version
+      - name: Replace the placeholder in manifest.yaml with the new version
         run: |
-          # Replace the placeholder in manifest.yaml with the new version
-          sed -i "s|image: manisankardivi/new:${{ env.VERSION }}|image: manisankardivi/new:${{ env.VERSION }}|" ./manifest.yaml
+          sed -i "s|\${VERSION}|${{ env.VERSION }}|g" ./manifest.yaml
           cat ./manifest.yaml  # Optional: print to verify the changes
+
 
       - name: Apply Kubernetes manifest
         run: |
