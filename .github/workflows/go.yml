@@ -35,45 +35,27 @@ jobs:
           path: dist
           if-no-files-found: warn
 
-      - name: Get version from commit message
-        id: version
-        run: |
-          # Get the latest commit message
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "Commit Message: $COMMIT_MESSAGE"
-          
-          # Extract version from the commit message (assuming it's in format "v1.0.1")
-          VERSION=$(echo "$COMMIT_MESSAGE" | grep -oP 'v\d+\.\d+\.\d+' || echo "v0.0.0")
-          
-          # If no version is found, fallback to default version
-          if [ "$VERSION" == "" ]; then
-            VERSION="v0.0.0"
-          fi
-          
-          echo "Version extracted: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # Build the Docker image with the extracted version tag
-      - name: Build Docker image
-        run: |
-          docker build -t manisankardivi/test:${{ env.VERSION }} .
-          docker images
-
-      # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-  
-      # Push the Docker image with the extracted
+
+      - name: Extract version from versions.txt
+        id: version
+        run: |
+          # Extract version from versions.txt (after 'VERSION: ')
+          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' versions.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version extracted: $VERSION"
+
+      - name: Build Docker image with extracted version
+        run: |
+          docker build -t manisankardivi/new:${{ env.VERSION }} .
+        
       - name: Push Docker image
         run: |
-          docker push manisankardivi/test:${{ env.VERSION }}
-  
-      # Verify Docker images pushed
-      - name: Verify Docker images
-        run: |
-          docker images
-          docker ps -a
-            
+          docker push manisankardivi/new:${{ env.VERSION }}
