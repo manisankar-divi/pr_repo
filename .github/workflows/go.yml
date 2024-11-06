@@ -77,11 +77,3 @@ jobs:
           docker images
           docker ps -a
             
-      # Create and push the Git tag with the extracted version
-      - name: Create and push Git tag
-        run: |
-          git tag ${{ env.VERSION }}
-          git push origin ${{ env.VERSION }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure authentication for Git push
-
