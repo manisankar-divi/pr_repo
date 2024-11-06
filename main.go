@@ -20,11 +20,11 @@ func init() {
   log.SetLevel(log.WarnLevel)
 }
 
-
+// hello world from 1
 // helloHandler handles HTTP requests to the root URL.
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	// This will return the string without a newline
-	fmt.Fprint(w, "Hello, World! a") // Change Fprintln to Fprint
+	fmt.Fprint(w, "Hello, World!") // Change Fprintln to Fprint
 }
 
 // main function sets up the HTTP server.
