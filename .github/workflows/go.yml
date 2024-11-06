@@ -59,21 +59,28 @@ jobs:
       - name: Push Docker image
         run: |
           docker push manisankardivi/new:${{ env.VERSION }}
+      - name: Output Run ID
+        run: echo ${{ github.run_id }}
+      - name: Output Run Number
+        run: echo ${{ github.run_number }}
+      - name: Output Run Attempt
+        run: echo ${{ github.run_attempt }}
 
-  deploy:
-    runs-on: self-hosted
-    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Check manifest files
-        run: ls -la
+  #     - name: Check manifest files
+  #       run: ls -la
         
-      - name: Replace the placeholder in manifest.yaml with the new version
-        run: |
-          sed -i "s|\${VERSION}|${{ env.VERSION }}|g" ./manifest.yaml
-          cat ./manifest.yaml  # Optional: print to verify the changes
+  #     - name: Replace the placeholder in manifest.yaml with the new version
+  #       run: |
+  #         sed -i "s|\${VERSION}|${{ env.VERSION }}|g" ./manifest.yaml
+  #         cat ./manifest.yaml  # Optional: print to verify the changes
+      
 
 
       - name: Apply Kubernetes manifest
