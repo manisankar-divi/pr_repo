@@ -71,11 +71,13 @@ jobs:
       - name: Check manifest files
         run: ls -la
         
-      - name: Read version from version.txt and update manifest.yaml
+      - name: Read version from VERSION file
         run: |
-          # Extract the version from version.txt
-          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' version.txt)
+          # Read the version from the VERSION file
+          VERSION=$(cat VERSION)
           echo "Version extracted: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
+
 
           # Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
