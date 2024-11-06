@@ -76,7 +76,11 @@ jobs:
 
       - name: Check manifest files
         run: ls -la
-
+        
+      - name: Update Kubernetes deployment with new image tag
+        run: |
+          kubectl set image deployment/go-deploy go-container=manisankardivi/new:${{ env.VERSION }} --record
+          
       - name: Verify Kubernetes resources
         run: |
           kubectl apply -f manifest.yaml
