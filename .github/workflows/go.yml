@@ -48,30 +48,36 @@ jobs:
         id: version
         run: |
           # Extract version from versions.txt (after 'VERSION: ')
-          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' version.txt)
+          VERSION=$(grep -oP '(?<=VERSION: )v\d+\.\d+\.\d+' versions.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Version extracted: $VERSION"
 
       - name: Build Docker image with extracted version
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
-        
+
       - name: Push Docker image
         run: |
           docker push manisankardivi/new:${{ env.VERSION }}
 
   deploy:
-    runs-on: self-hosted  
+    runs-on: self-hosted
+    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - uses: actions-hub/kubectl@master
+
+      - name: Get Kubernetes Pods
+        uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         with:
           args: get pods
-      - name: checking manifest files
+
+      - name: Check manifest files
         run: ls -la
-      - name: k8s
-        run: kubectl get all -A
+
+      - name: Verify Kubernetes resources
+        run: |
+          kubectl apply -f manifest.yaml
+          kubectl get all
