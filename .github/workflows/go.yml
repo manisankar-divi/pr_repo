@@ -44,12 +44,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract version from versions.txt
-        id: version
+      - name: Read version from VERSION file
+        id: version_step
         run: |
-          version=$(grep -oP 'd+\.\d+\.\d+' VERSION)
-          echo "version=$VERSION" >> $VERSION
+          # Read the entire content of the VERSION file and trim any surrounding whitespace
+          VERSION=$(cat VERSION | xargs)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Version extracted: $VERSION"
+      
 
       - name: Build Docker image with extracted version
         run: |
