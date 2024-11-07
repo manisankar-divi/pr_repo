@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@v4
   
       - name: Verify Kubernetes Manifests
-        run: ls -la kubernetes/
+        run: ls -la
   
       - name: Load VERSION
         id: load_version
@@ -84,24 +84,9 @@ jobs:
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" kubernetes/manifest.yaml
           echo "Updated manifest.yaml with image tag: $VERSION"
   
-      - name: Apply Kubernetes Manifest
-        uses: stefanzweifel/k8s-action@v2.0.0
+      - uses: azure/setup-kubectl@v4
         with:
-          args: apply -f kubernetes/manifest.yaml
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}  # Ensure KUBECONFIG is securely set in GitHub Secrets
-  
-      - name: Verify Deployment Rollout
-        run: |
-          kubectl rollout status deployment/go-deploy --timeout=120s
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed."
-            exit 1
-          fi
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-  
-      - name: Confirm All Resources
-        run: kubectl get all -n default
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+           version: 'default' # default is latest stable
+        id: install
+      - run: |
+          kubectl get all
