@@ -85,7 +85,7 @@ jobs:
           
           # Extract and display only the version part from the updated line
           UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
-          echo "Image Updated version:$UPDATED_VERSION"
+          echo "Image Updated version: $UPDATED_VERSION"
           
           # k8s Deploy
           kubectl apply -f ./manifest.yaml
