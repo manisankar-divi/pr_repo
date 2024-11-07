@@ -82,9 +82,10 @@ jobs:
 
           # Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
-
-          # Print the updated manifest.yaml to verify the changes
-          cat manifest.yaml
+          
+          # Display only the changed line in manifest.yaml
+          echo "Updated line in manifest.yaml:"
+          grep "image: manisankardivi/new:$VERSION" manifest.yaml
           
           # k8s Deploy
           kubectl apply -f ./manifest.yaml
