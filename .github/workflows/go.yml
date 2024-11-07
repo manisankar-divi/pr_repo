@@ -85,6 +85,17 @@ jobs:
 
           # Print the updated manifest.yaml to verify the changes
           cat manifest.yaml
+          
           # k8s Deploy
           kubectl apply -f ./manifest.yaml
-          kubectl get all
+          
+          # Wait for the deployment to complete with a 60-second timeout
+          if kubectl rollout status deployment/go-deploy --timeout=60s; then
+            echo "Deployment 'go-deploy' created successfully!"
+          else
+            echo "Deployment 'go-deploy' failed to complete within the timeout period."
+            exit 1  # Exit with failure status
+          fi
+
+      - name: Verify Deployment Status
+        run: kubectl get all
