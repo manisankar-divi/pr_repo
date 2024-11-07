@@ -84,7 +84,9 @@ jobs:
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           echo "Updated manifest.yaml with image tag: $VERSION"
   
-      - uses: azure/setup-kubectl@v4
-        id: install
-      - run: |
-          kubectl get all
+      - name: Deploy to Kubernetes
+        uses: stefanzweifel/k8s-action@v2
+        with:
+          args: apply -f ./manifest.yaml
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
