@@ -85,8 +85,6 @@ jobs:
           echo "Updated manifest.yaml with image tag: $VERSION"
   
       - uses: azure/setup-kubectl@v4
-        with:
-           version: 'default' # default is latest stable
         id: install
       - run: |
           kubectl get all
