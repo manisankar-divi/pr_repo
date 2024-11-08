@@ -69,9 +69,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
   
-      - name: Verify Kubernetes Manifests
-        run: ls -la
-  
       - name: Load VERSION
         id: load_version
         run: |
@@ -83,24 +80,34 @@ jobs:
         run: |
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           echo "Updated manifest.yaml with image tag: $VERSION"
-          
-      - uses: actions-hub/kubectl@master
+        
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBE_CONFIG_DATA" | base64 -d > ~/.kube/config
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+  
+      - name: Verify Kubernetes Access
+        run: kubectl version --client
+  
+      - name: Get Pods (Debugging)
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ~/.kube/config
         with:
           args: get pods
-          
-      - name: checking manifest files
+  
+      - name: Check Manifest Files
         run: ls -la
-      - name: k8s
+  
+      - name: List All Kubernetes Resources
         run: kubectl get all -A
-      
+  
       - name: Deploy to Kubernetes
         run: |
-          # Example kubectl command, replace with your deployment command
-          kubectl apply -f manifest.yaml  # adjust based on your manifest files
+          # Apply the updated manifest file
+          kubectl apply -f manifest.yaml
   
       - name: Verify Deployment
-        run: |
-          kubectl get pods -o wide
-  
+        run: kubectl get pods -o wide
