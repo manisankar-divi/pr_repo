@@ -84,9 +84,24 @@ jobs:
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           echo "Updated manifest.yaml with image tag: $VERSION"
   
-      - name: Deploy to On-Premises Kubernetes cluster
-        uses: MP-ES/k8s-deploy@v2.2.2
-      - run: |
-          kubectl get all
-        
-            
+      - name: Set up kubeconfig
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          echo "$KUBE_CONFIG_DATA" | base64 -d > ~/.kube/config
+  
+      - name: Install kubectl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y kubectl
+  
+      - name: Deploy to Kubernetes
+        run: |
+          # Example kubectl command, replace with your deployment command
+          kubectl apply -f manifest.yaml  # adjust based on your manifest files
+  
+      - name: Verify Deployment
+        run: |
+          kubectl get pods -o wide
+          
+              
