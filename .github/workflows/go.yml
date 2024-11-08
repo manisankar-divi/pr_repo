@@ -55,41 +55,82 @@ jobs:
       - name: Build Docker image with extracted version
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
+          
       - name: Push Docker image
         run: |
           docker push manisankardivi/new:${{ env.VERSION }}
-  deploy:
-    runs-on: self-hosted
-    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check manifest files
-        run: ls -la
-        
-      - name: Read version from VERSION file
+            # Step 12: Update K8S Manifest & Push to Repo
+            
+      - name: Update K8S Manifest & Push to Repo
         run: |
+          # Checkout the Go project repository
+          git clone https://github.com/manisankar-divi/go-project.git  # Clone the go-project repository
+
+          cd go-project  # Navigate to the go-project repository
+
           # Read the version from the VERSION file
           VERSION=$(cat VERSION)
           echo "Version extracted: $VERSION"
-          echo "VERSION=$VERSION" >> $VERSION  # Save version to environment variable
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
+
           # Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           
           # Extract and display only the version part from the updated line
           UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
           echo "Image Updated version: $UPDATED_VERSION"
+
+          # Commit and push the changes to the Go project's repository (if manifest.yaml exists here)
+          git config --global user.email "manisankar.divi@gmail.com"  # Set your email for commits
+          git config --global user.name "ManiSankar"  # Set the user name for the commits
+          git add manifest.yaml
+          git commit -m "Updated manifest.yaml with the new version | GitHub Actions Pipeline"
+          git push https://github.com/manisankar-divi/go-project.git HEAD:main  # Push the changes to the Go project's repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+
+
+
+
+
+
+
+
+
+
           
-          # k8s Deploy
-          kubectl apply -f ./manifest.yaml
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Check manifest files
+  #       run: ls -la
+        
+  #     - name: Read version from VERSION file
+  #       run: |
+  #         # Read the version from the VERSION file
+  #         VERSION=$(cat VERSION)
+  #         echo "Version extracted: $VERSION"
+  #         echo "VERSION=$VERSION" >> $VERSION  # Save version to environment variable
+  #         # Replace the image version in manifest.yaml with the extracted version
+  #         sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           
-          # Wait for the deployment to complete with a 60-second timeout
-          if kubectl rollout status deployment/go-deploy --timeout=60s; then
-            echo "Deployment 'go-deploy' created successfully!"
-          else
-            echo "Deployment 'go-deploy' failed to complete within the timeout period."
-            exit 1  # Exit with failure status
-          fi
-      - name: Verify Deployment Status
-        run: kubectl get all
+  #         # Extract and display only the version part from the updated line
+  #         UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
+  #         echo "Image Updated version: $UPDATED_VERSION"
+          
+  #         # k8s Deploy
+  #         kubectl apply -f ./manifest.yaml
+          
+  #         # Wait for the deployment to complete with a 60-second timeout
+  #         if kubectl rollout status deployment/go-deploy --timeout=60s; then
+  #           echo "Deployment 'go-deploy' created successfully!"
+  #         else
+  #           echo "Deployment 'go-deploy' failed to complete within the timeout period."
+  #           exit 1  # Exit with failure status
+  #         fi
+  #     - name: Verify Deployment Status
+  #       run: kubectl get all
