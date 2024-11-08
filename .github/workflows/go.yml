@@ -73,4 +73,4 @@ jobs:
           # Commit and push changes
           git add manifest.yaml
           git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
-          git push origin main
+          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git main
