@@ -63,31 +63,36 @@ jobs:
             
       - name: Update K8S Manifest & Push to Repo
         run: |
-          # Checkout the Go project repository
-          git clone https://github.com/manisankar-divi/go-project.git  # Clone the go-project repository
+          # # Checkout the Go project repository
+          # git clone https://github.com/manisankar-divi/go-project.git  # Clone the go-project repository
 
-          cd go-project  # Navigate to the go-project repository
+          # cd go-project  # Navigate to the go-project repository
 
           # Read the version from the VERSION file
           VERSION=$(cat VERSION)
           echo "Version extracted: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
 
-          # Replace the image version in manifest.yaml with the extracted version
+          # Step 1: Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           
-          # Extract and display only the version part from the updated line
+          # Step 2: Extract and display the updated version from manifest.yaml for confirmation
           UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
           echo "Image Updated version: $UPDATED_VERSION"
-
-          # Commit and push the changes to the Go project's repository (if manifest.yaml exists here)
-          git config --global user.email "manisankar.divi@gmail.com"  # Set your email for commits
-          git config --global user.name "ManiSankar"  # Set the user name for the commits
-          git add manifest.yaml
+          
+          # Step 3: Configure Git with your name and email for committing
+          git config --global user.email "manisankar.divi@gmail.com"
+          git config --global user.name "ManiSankar"
+          
+          # Step 4: Add the manifest.yaml to the staging area
+          git add .
+          
+          # Step 5: Commit the changes with a message
           git commit -m "Updated manifest.yaml with the new version | GitHub Actions Pipeline"
-          git push https://github.com/manisankar-divi/go-project.git HEAD:main  # Push the changes to the Go project's repository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+          
+          # Step 6: Push the changes to the repository
+          git push https://github.com/manisankar-divi/go-project.git HEAD:main
+          
 
 
 
