@@ -85,11 +85,13 @@ jobs:
           echo "Updated manifest.yaml with image tag: $VERSION"
   
       - name: Set up kubeconfig
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         run: |
+          mkdir -p ~/.kube # Ensure the .kube directory exists
           echo "$KUBE_CONFIG_DATA" | base64 -d > ~/.kube/config
-  
+          shell: /usr/bin/bash -e {0}
+          env:
+            KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      
       - name: Install kubectl
         run: |
           sudo apt-get update
