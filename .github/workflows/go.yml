@@ -27,7 +27,6 @@ jobs:
         run: |
           mkdir -p dist
           go build -o dist/main ./...
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -56,51 +55,41 @@ jobs:
       - name: Build Docker image with extracted version
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
-
       - name: Push Docker image
         run: |
           docker push manisankardivi/new:${{ env.VERSION }}
-
-
   deploy:
-    runs-on: ubuntu-latest
-    needs: build_and_scan
+    runs-on: self-hosted
+    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-  
-      - name: Verify Kubernetes Manifests
-        run: ls -la
-  
-      - name: Load VERSION
-        id: load_version
-        run: |
-          VERSION=$(cat VERSION | xargs)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Loaded VERSION: $VERSION"
-  
-      - name: Update Image Version in Manifest
-        run: |
-          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
-          echo "Updated manifest.yaml with image tag: $VERSION"
 
-      - name: Configure kubeconfig
+      - name: Check manifest files
+        run: ls -la
+        
+      - name: Read version from VERSION file
         run: |
-          mkdir -p ~/.kube  # Ensure .kube directory exists
-          echo "$KUBE_CONFIG_DATA" | base64 -d > ~/.kube/config
-          cat ~/.kube/config  # Optional: Output kubeconfig to verify decoding
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-  
-      - name: Test kubectl connection
-        run: |
-          kubectl version --client
-          kubectl get nodes
+          # Read the version from the VERSION file
+          VERSION=$(cat VERSION)
+          echo "Version extracted: $VERSION"
+          echo "VERSION=$VERSION" >> $VERSION  # Save version to environment variable
+          # Replace the image version in manifest.yaml with the extracted version
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           
-      - name: Apply Kubernetes Manifests
-        run: |
-          kubectl apply -f manifest.yaml
+          # Extract and display only the version part from the updated line
+          UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
+          echo "Image Updated version: $UPDATED_VERSION"
           
-      - name: Verify Deployment
-        run: |
-          kubectl get pods -o wide
+          # k8s Deploy
+          kubectl apply -f ./manifest.yaml
+          
+          # Wait for the deployment to complete with a 60-second timeout
+          if kubectl rollout status deployment/go-deploy --timeout=60s; then
+            echo "Deployment 'go-deploy' created successfully!"
+          else
+            echo "Deployment 'go-deploy' failed to complete within the timeout period."
+            exit 1  # Exit with failure status
+          fi
+      - name: Verify Deployment Status
+        run: kubectl get all
