@@ -55,18 +55,14 @@ jobs:
           docker build -t manisankardivi/new:${{ env.VERSION }} .
           docker push manisankardivi/new:${{ env.VERSION }}
 
-      - name: Checkout Kubernetes manifest repo
-        uses: actions/checkout@v4
-        with:
-          repository: manisankar-divi/k8s-repo
-          path: k8s-repo
-          ref: main
-
       - name: Update Kubernetes manifest
         run: |
+          pwd
           ls -la
+          git clone https://github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
-          # sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
+          cat manifest.yaml
 
           # # Configure Git
           # git init .
