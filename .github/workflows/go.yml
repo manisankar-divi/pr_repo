@@ -60,7 +60,9 @@ jobs:
           pwd
           ls -la
           git clone https://github.com/manisankar-divi/k8s-repo.git
+          ls -la
           cd k8s-repo
+          ls -la
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
           cat manifest.yaml
 
