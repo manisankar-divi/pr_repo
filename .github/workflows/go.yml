@@ -63,10 +63,12 @@ jobs:
             
       - name: Update K8S Manifest & Push to Repo
         run: |
-          # # Checkout the Go project repository
-          # git clone https://github.com/manisankar-divi/go-project.git  # Clone the go-project repository
+          # Checkout the Go project repository
+          git clone https://github.com/manisankar-divi/go-project.git  # Clone the go-project repository
+          cd go-project  # Navigate to the go-project repository
+          git init .
+          ls -la
 
-          # cd go-project  # Navigate to the go-project repository
 
           # Read the version from the VERSION file
           VERSION=$(cat VERSION)
