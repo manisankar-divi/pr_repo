@@ -76,6 +76,10 @@ jobs:
           
           # Use sed to replace the image version in the manifest
           sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.VERSION }}|" manifest.yaml
+
+          # Echo the updated line(s) in manifest.yaml to verify the change
+          echo "Updated manifest.yaml:"
+          grep "image:" manifest.yaml
           
           # Commit the changes and push to the repository
           git config --global user.name "${{ secrets.GIT_USERNAME }}"
