@@ -94,7 +94,8 @@ jobs:
           cat manifest.yaml
           
           # Step 6: Push the changes to the repository
-          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+          git push origin main 
+          #https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
           
 
 
