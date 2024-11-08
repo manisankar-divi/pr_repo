@@ -81,14 +81,15 @@ jobs:
           echo "Image Updated version: $UPDATED_VERSION"
           
           # Step 3: Configure Git with your name and email for committing
-          git config --global user.email "manisankar.divi@gmail.com"
-          git config --global user.name "ManiSankar"
+          git config --global user.email "manisankar-divi@gmail.com"
+          git config --global user.name "manisankar-divi"
           
           # Step 4: Add the manifest.yaml to the staging area
           git add .
           
           # Step 5: Commit the changes with a message
           git commit -m "Updated manifest.yaml with the new version | GitHub Actions Pipeline"
+          cat manifest.yaml
           
           # Step 6: Push the changes to the repository
           git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
