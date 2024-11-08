@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir -p dist
           go build -o dist/main ./...
+      
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -46,65 +47,43 @@ jobs:
       - name: Read version from VERSION file
         id: version_step
         run: |
-          # Read the entire content of the VERSION file and trim any surrounding whitespace
           VERSION=$(cat VERSION | xargs)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version extracted: $VERSION"
-      
+        outputs:
+          version: ${{ steps.version_step.outputs.VERSION }}
 
       - name: Build Docker image with extracted version
-        run: |
-          docker build -t manisankardivi/new:${{ env.VERSION }} .
-          
+        run: docker build -t manisankardivi/new:${{ steps.version_step.outputs.version }} .
+
       - name: Push Docker image
-        run: |
-          docker push manisankardivi/new:${{ env.VERSION }}
-            # Step 12: Update K8S Manifest & Push to Repo
-            
-              
+        run: docker push manisankardivi/new:${{ steps.version_step.outputs.version }}
+
   deploy:
     runs-on: ubuntu-latest
-    needs: build_and_scan  # Ensures this job only runs after build_and_scan completes
+    needs: build_and_scan
     steps:
-      - name: Checkout code
+      - name: Checkout k8s-repo
         uses: actions/checkout@v4
+        with:
+          repository: manisankar-divi/k8s-repo
+          path: k8s-repo
 
-      - name: Check manifest files
-        run: ls -la
-        
       - name: Update K8S Manifest & Push to Repo
         run: |
-          # Checkout the Go project repository
-          git clone https://github.com/manisankar-divi/k8s-repo.git  # Clone the go-project repository
-          cd k8s-repo # Navigate to the go-project repository
-          git init .
-          ls -la
+          cd k8s-repo
 
+          # Use the version from the previous job
+          VERSION="${{ needs.build_and_scan.outputs.version }}"
+          echo "Updating manifest.yaml with version $VERSION"
 
-          # Read the version from the VERSION file
-          VERSION=$(cat VERSION)
-          echo "Version extracted: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
-
-          # Step 1: Replace the image version in manifest.yaml with the extracted version
+          # Update the manifest file
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
-          
-          # Step 2: Extract and display the updated version from manifest.yaml for confirmation
-          UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
-          echo "Image Updated version: $UPDATED_VERSION"
-          
-          # Step 3: Configure Git with your name and email for committing
+
+          # Configure Git
           git config --global user.email "manisankar-divi@gmail.com"
           git config --global user.name "manisankar-divi"
-          
-          # Step 4: Add the manifest.yaml to the staging area
-          git add .
-          
-          # Step 5: Commit the changes with a message
-          git commit -m "Updated manifest.yaml with the new version | GitHub Actions Pipeline"
-          cat manifest.yaml
-          
-          # Step 6: Push the changes to the repository
-          git push origin main 
-          #https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
 
+          # Commit and push changes
+          git add manifest.yaml
+          git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
+          git push origin main
