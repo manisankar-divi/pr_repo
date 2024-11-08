@@ -91,7 +91,7 @@ jobs:
           git commit -m "Updated manifest.yaml with the new version | GitHub Actions Pipeline"
           
           # Step 6: Push the changes to the repository
-          git push https://github.com/${{ github.repository }}.git HEAD:main
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
           
 
 
