@@ -8,68 +8,78 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
+      # Step 1: Checkout code
+      - name: Checkout source code
         uses: actions/checkout@v4
 
+      # Step 2: Set up Go environment
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
-      
-      - name: Install dependencies
+
+      # Step 3: Install Go dependencies
+      - name: Install Go dependencies
         run: go mod download
-          
-      - name: Test with the Go CLI
+
+      # Step 4: Run Go tests
+      - name: Run Go tests
         run: go test ./...
 
-      - name: Build the application
+      # Step 5: Build the Go application
+      - name: Build Go application
         run: |
           mkdir -p dist
           go build -o dist/main ./...
 
-      - name: Upload artifacts
+      # Step 6: Upload build artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifact
+          name: go-artifact
           path: dist
           if-no-files-found: warn
 
+      # Step 7: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 8: Docker login to Docker Hub using GitHub secrets
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Read version from VERSION file
-        id: read_version
+      # Step 9: Read version from VERSION file and set environment variable
+      - name: Set Docker image version
+        id: set_version
         run: |
           VERSION=$(cat VERSION | xargs)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      # Step 10: Build and push Docker image securely
       - name: Build and push Docker image
         run: |
-          docker build -t manisankardivi/new:${{ env.VERSION }} .
-          docker push manisankardivi/new:${{ env.VERSION }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ env.VERSION }} \
+            --cache-from=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ env.VERSION }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ env.VERSION }}
 
-      - name: Update Kubernetes manifest
+      # Step 11: Update Kubernetes manifest with new image version
+      - name: Update Kubernetes manifest with image version
         run: |
-          pwd
-          ls -la
-          git clone https://github.com/manisankar-divi/k8s-repo.git
-          ls -la
+          # Clone the Kubernetes repository securely
+          git clone https://github.com/${{ secrets.K8S_REPO }}.git
           cd k8s-repo
-          ls -la
-          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
-          cat manifest.yaml
-
-          # Configure Git
-          git init .
-          git config --global user.email "manisankar-divi@gmail.com"
-          git config --global user.name "manisankar-divi"
+          
+          # Use sed to replace the image version in the manifest
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ env.VERSION }}|" manifest.yaml
+          
+          # Commit the changes and push to the repository
+          git config --global user.name "${{ secrets.GIT_USERNAME }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
           git add manifest.yaml
-          git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
-          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git main
+          git commit -m "Updated manifest.yaml with Docker image version ${{ env.VERSION }}"
+          git push https://x-access-token:${{ secrets.GIT_ACCESS_TOKEN }}@github.com/${{ secrets.K8S_REPO }}.git main
