@@ -3,11 +3,42 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Trigger workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger workflow on pull request to the main branch
 
 jobs:
+  # CodeQL Static Analysis Job
+  codeql:
+    runs-on: ubuntu-latest  # Specify Ubuntu as the runner OS
+    name: "Run CodeQL Analysis"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/setup-codeql@v2
+        with:
+          languages: go
+
+      - name: Initialize CodeQL database
+        run: |
+          codeql database create --language=go --source-root .
+
+      - name: Run CodeQL analysis
+        run: |
+          codeql analyze --format=sarif-latest --output=codeql-results.sarif --run-queries=all codeql-database
+
+      - name: Upload CodeQL results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: codeql-results.sarif
+
+  # Build and Deploy Job
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Specify Ubuntu as the runner OS
+    needs: codeql  # This job will run after the CodeQL job completes
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,6 +50,16 @@ jobs:
       
       - name: Install dependencies
         run: go mod download
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.go/pkg/mod
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
           
       - name: Test with the Go CLI
         run: go test ./...
@@ -27,6 +68,7 @@ jobs:
         run: |
           mkdir -p dist
           go build -o dist/main ./...
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -48,10 +90,12 @@ jobs:
         run: |
           VERSION=$(cat VERSION | xargs)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
           docker push manisankardivi/new:${{ env.VERSION }}
+
       - name: Update Image Version and Push Changes
         run: |
           git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
@@ -75,6 +119,3 @@ jobs:
             git add manifest.yaml
             git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
             git push origin main
-          fi
-
-      
