@@ -63,7 +63,7 @@ jobs:
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
           cat manifest.yaml
           # Configure Git
-          git init .
+          # git init .
           git config --global user.email "manisankar-divi@gmail.com"
           git config --global user.name "manisankar-divi"
           git add manifest.yaml
