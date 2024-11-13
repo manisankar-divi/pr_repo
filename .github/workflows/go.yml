@@ -74,6 +74,21 @@ jobs:
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
           docker push manisankardivi/new:${{ env.VERSION }}
+        
+      - name: Run Docker image vulnerability scan with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'image'  # Scan a Docker image
+          image: manisankardivi/new:${{ env.VERSION }}  # Docker image to scan
+          ignore-unfixed: true  # Ignore unfixed vulnerabilities
+          format: 'sarif'  # Output in SARIF format
+          output: 'trivy-results.sarif'  # Save output to file
+          severity: 'CRITICAL'  # Only critical vulnerabilities
+          skip-setup-trivy: true  # Skip Trivy setup if already installed
+          
+      - name: push Docker image to Digital Ocean Registry
+        run: |
+          docker push manisankardivi/new:${{ env.VERSION }}
 
       - name: Update Image Version and Push Changes
         run: |
