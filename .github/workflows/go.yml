@@ -94,6 +94,7 @@ jobs:
 
       - name: Scan Docker image with Trivy
         run: |
+          docker pull manisankardivi/new:${{ env.VERSION }}
           trivy image manisankardivi/new:${{ env.VERSION }}
         
       
