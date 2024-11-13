@@ -74,10 +74,11 @@ jobs:
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
           docker push manisankardivi/new:${{ env.VERSION }}
+          
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: "akshaydhumale/app"
+          image-ref: "manisankardivi/new:200.000.008"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
