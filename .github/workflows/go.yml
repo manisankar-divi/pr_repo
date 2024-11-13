@@ -92,11 +92,16 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.57.0/trivy_0.57.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.57.0_Linux-64bit.deb
 
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Wait before scanning
+        run: sleep 10
+
       - name: Scan Docker image with Trivy
         run: |
-          docker --version
           trivy image soubarniya/go-api:latest
-      
+          
       # - name: Update Image Version and Push Changes
       #   run: |
       #     git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
