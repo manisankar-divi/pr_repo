@@ -74,33 +74,42 @@ jobs:
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
           docker push manisankardivi/new:${{ env.VERSION }}
-
-  scan_image:
-    runs-on: ubuntu-latest
-    needs: build_and_deploy
-    steps:
-      - name: Cache Trivy DB
-        uses: actions/cache@v2
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          path: ~/.cache/trivy
-          key: ${{ runner.os }}-trivy-db
+          image-ref: "akshaydhumale/app"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "HIGH,CRITICAL"
 
-      - name: Install Trivy
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.57.0/trivy_0.57.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.57.0_Linux-64bit.deb
+  # scan_image:
+  #   runs-on: ubuntu-latest
+  #   needs: build_and_deploy
+  #   steps:
+  #     - name: Cache Trivy DB
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ~/.cache/trivy
+  #         key: ${{ runner.os }}-trivy-db
 
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+  #     - name: Install Trivy
+  #       run: |
+  #         sudo apt-get update -y
+  #         sudo apt-get install -y wget
+  #         wget https://github.com/aquasecurity/trivy/releases/download/v0.57.0/trivy_0.57.0_Linux-64bit.deb
+  #         sudo dpkg -i trivy_0.57.0_Linux-64bit.deb
 
-      - name: Wait before scanning
-        run: sleep 10
+  #     - name: Login to GitHub Container Registry
+  #       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Scan Docker image with Trivy
-        run: |
-          trivy image soubarniya/go-api:latest
+  #     - name: Wait before scanning
+  #       run: sleep 10
+
+  #     - name: Scan Docker image with Trivy
+  #       run: |
+  #         trivy image soubarniya/go-api:latest
           
       # - name: Update Image Version and Push Changes
       #   run: |
