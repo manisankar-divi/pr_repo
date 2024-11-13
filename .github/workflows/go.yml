@@ -73,7 +73,8 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
-          docker push manisankardivi/new:${{ env.VERSION }}
+          docker images
+          
           
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
