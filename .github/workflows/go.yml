@@ -81,9 +81,8 @@ jobs:
           echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install trivy
-          trivy image -f json -o trivy.json --severity HIGH,CRITICAL --exit-code 1 manisankardivi/new:${{ env.VERSION }}
-
-          
+          trivy image -f json -o trivy.json --severity HIGH,CRITICAL --exit-code 1 --skip-db-update manisankardivi/new:${{ env.VERSION }}
+                   
       - name: push Docker image to Digital Ocean Registry
         run: |
           docker push manisankardivi/new:${{ env.VERSION }}
