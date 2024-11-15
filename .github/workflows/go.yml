@@ -39,7 +39,7 @@ jobs:
 
       - name: Build the application
         run: |
-          go build 
+          go build -v
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
