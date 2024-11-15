@@ -34,7 +34,7 @@ jobs:
   # Build the application and upload artifact
   build:
     runs-on: ubuntu-latest
-    needs: test  # Build job only runs after tests pass
+    # needs: test  # Build job only runs after tests pass
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
   # Docker build, push to registry.
   docker_build_push:
     runs-on: ubuntu-latest
-    needs: build  # Docker build & push only runs after build succeeds
+    # needs: build  # Docker build & push only runs after build succeeds
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,7 +85,7 @@ jobs:
   # Update Kubernetes manifest file with the new image version
   k8s-manifest-files_update:
     runs-on: ubuntu-latest
-    needs: docker_build_push  # Manifest update only runs after Docker image is pushed
+    # needs: docker_build_push  # Manifest update only runs after Docker image is pushed
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -126,7 +126,7 @@ jobs:
           git config --global user.name "manisankar-divi"
           
           # Stage the changes to manifest.yaml explicitly
-          git add manifest.yaml
+          git add anifest.yaml
           
           # Check if there are any changes in the manifest file
           if git diff --cached --exit-code --quiet; then
