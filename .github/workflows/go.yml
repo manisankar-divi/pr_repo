@@ -94,6 +94,7 @@ jobs:
         run: |
           git clone https://github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
+          ls -la
 
       - name: Update Image Version in manifest.yaml
         run: |
