@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           go mod download
+          go install
 
       - name: Install dependencies
         run: |
