@@ -51,6 +51,7 @@ jobs:
         run: |
           pwd
           ls -la
+          tree dist
           
       # checking Gitleaks 
       - uses: gitleaks/gitleaks-action@v2
