@@ -92,32 +92,18 @@ jobs:
 
       - name: Checkout Kubernetes repo
         run: |
+          pwd
+          ls -la
           git clone https://github.com/manisankar-divi/k8s-repo.git
-          cd k8s-repo  # Change to the k8s-repo directory after cloning
-  
-      - name: Update Image Version in manifest.yaml
-        run: |
-          cd k8s-repo  # Ensure we're in the correct directory
-          VERSION=${{ env.VERSION }}
-          echo "Updating manifest.yaml with version $VERSION..."
-          # Ensure that the image version is replaced correctly
-          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
-  
-      - name: Verify manifest changes
-        run: |
-          cd k8s-repo  # Ensure we're in the correct directory
-          git status
-          git diff
-  
-      - name: Configure Git
-        run: |
-          cd k8s-repo  # Ensure we're in the correct directory
+          ls -la
+          cd k8s-repo
+          ls -la
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
+          cat manifest.yaml
+          # Configure Git
+          git init .
           git config --global user.email "manisankar-divi@gmail.com"
           git config --global user.name "manisankar-divi"
-  
-      - name: Commit and Push changes
-        run: |
-          cd k8s-repo  # Ensure we're in the correct directory
-          git add manifest.yaml  # Stage the file for commit
+          git add manifest.yaml
           git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
-          git push origin main || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git main
