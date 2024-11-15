@@ -49,8 +49,8 @@ jobs:
       # checks artifact 
       - name: Checking artifact 
         run: |
-          ls
-          ls dist
+          pwd
+          ls 
           
       # checking Gitleaks 
       - uses: gitleaks/gitleaks-action@v2
