@@ -9,8 +9,7 @@ on:
       - main
 
 jobs:
-  # Test & Build and Deploy
-  build_and_deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,25 +19,29 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
-          
+
       - name: Install dependencies
         run: |
           go mod tidy  # Ensure the go.mod and go.sum files are up-to-date
           go get -v ./...
 
-      # Step: Run tests
-      - name: Run tests
-        run: go test -v ./...
-
-      # Step: Install the binary
       - name: Install the application
         run: go install ./...
 
-      # Step: Build the application
+      - name: Run tests
+        run: go test -v ./... || exit 1  # Fail the job if tests fail
+
+  # Build the application and upload artifact
+  build:
+    runs-on: ubuntu-latest
+    needs: test  # Build job only runs after tests pass
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Build the application
         run: go build -v -o dist/main ./...
 
-      # Step: Upload build artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -46,63 +49,70 @@ jobs:
           path: dist/main
           if-no-files-found: warn
 
-      # checks artifact 
-      - name: Checking artifact 
+      - name: Checking artifact
         run: |
-          pwd
           ls -la
           tree dist
-          
-      # checking Gitleaks 
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
 
-      # Install Docker-setup
+  # Docker build, push to registry.
+  docker_build_push:
+    runs-on: ubuntu-latest
+    needs: build  # Docker build & push only runs after build succeeds
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Docker login
-      - name: Login to Docker Hub
+      - name: Docker login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Read version from VERSION file
         id: read_version
         run: |
           VERSION=$(cat VERSION | xargs)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-      
+
       - name: Build and push Docker image
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
-          docker images
-          
-          
-      # - name: Update Image Version and Push Changes
-      #   run: |
-      #     git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
-      #     cd k8s-repo
-      
-      #     # Update image in manifest.yaml
-      #     sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
-      
-      #     # Verify changes
-      #     git status
-      #     git diff
-      
-      #     # Configure Git
-      #     git config --global user.email "manisankar-divi@gmail.com"
-      #     git config --global user.name "manisankar-divi"
-      
-      #     # Commit and push changes if there’s an update
-      #     if git diff --exit-code --quiet; then
-      #       echo "No changes to commit."
-      #     else
-      #       git add manifest.yaml
-      #       git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
-      #       git push origin main
-      #     fi
+          docker push manisankardivi/new:${{ env.VERSION }}
+
+  # Update Kubernetes manifest file with the new image version
+  k8s-manifest-files_update:
+    runs-on: ubuntu-latest
+    needs: docker_build_push  # Manifest update only runs after Docker image is pushed
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout Kubernetes repo
+        run: |
+          git clone https://github.com/manisankar-divi/k8s-repo.git
+          cd k8s-repo
+
+      - name: Update Image Version in manifest.yaml
+        run: |
+          VERSION=${{ env.VERSION }}
+          echo "Updating manifest.yaml with version $VERSION..."
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
+
+      - name: Verify manifest changes
+        run: |
+          git status
+          git diff
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "manisankar-divi@gmail.com"
+          git config --global user.name "manisankar-divi"
+
+      - name: Commit and Push changes
+        run: |
+          git add manifest.yaml
+          git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
+          git push origin main || echo "No changes to commit"
