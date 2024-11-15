@@ -119,4 +119,4 @@ jobs:
           cd k8s-repo  # Ensure we're in the correct directory
           git add manifest.yaml
           git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
-        git push origin main || echo "No changes to commit"
+          git push origin main || echo "No changes to commit"
