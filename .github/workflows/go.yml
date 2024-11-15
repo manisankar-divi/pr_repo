@@ -113,6 +113,5 @@ jobs:
 
       - name: Commit and Push changes
         run: |
-          git add manifest.yaml
-          git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
+          git commit -a -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
           git push origin main || echo "No changes to commit"
