@@ -39,14 +39,17 @@ jobs:
 
       - name: Build the application
         run: |
-          go build -v
+          go build -v -o dist/main
+
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifact
-          path: dist
+          path: dist/main  # Upload the compiled binary
           if-no-files-found: warn
 
+          
       # checking Gitleaks 
       - uses: gitleaks/gitleaks-action@v2
         env:
