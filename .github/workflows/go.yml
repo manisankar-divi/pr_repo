@@ -22,7 +22,8 @@ jobs:
           go-version: '1.23.2'
 
       - name: Install dependencies
-        run: go mod download
+        run: |
+          go mod download
 
       - name: Cache Go modules
         uses: actions/cache@v4
@@ -35,11 +36,12 @@ jobs:
             ${{ runner.os }}-go-mod-
           
       - name: Test with the Go CLI
-        run: go test ./...
+        run: |
+          go test -v ./...
 
       - name: Build the application
         run: |
-          go build -v -o dist/main
+          go build -v ./...
 
           
       - name: Upload artifacts
