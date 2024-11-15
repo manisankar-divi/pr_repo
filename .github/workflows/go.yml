@@ -45,8 +45,12 @@ jobs:
           name: go-build-artifact
           path: dist/main
           if-no-files-found: warn
-          
 
+      # checks artifact 
+      - name: Checking artifact 
+        run: |
+          ls
+          ls dist
           
       # checking Gitleaks 
       - uses: gitleaks/gitleaks-action@v2
