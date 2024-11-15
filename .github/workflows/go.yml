@@ -89,19 +89,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      # Read the version from the VERSION file
       - name: Read version from VERSION file
         run: |
-          # Read the version from the VERSION file
           VERSION=$(cat VERSION)
           echo "Version extracted: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
-  
+          
+      # Git clone K8S repo
       - name: Checkout Kubernetes repo
         run: |
-          # Clone the k8s-repo repository
           git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
+          ls -la
           
           # Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
@@ -126,9 +127,6 @@ jobs:
           
             # Stage the changes to manifest.yaml
             git add manifest.yaml
-          
-            # Commit and push the changes to the repository
             git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
             git push origin main
-          
-        
+          fi
