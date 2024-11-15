@@ -89,40 +89,46 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Read version from VERSION file
+        run: |
+          # Read the version from the VERSION file
+          VERSION=$(cat VERSION)
+          echo "Version extracted: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
+  
       - name: Checkout Kubernetes repo
         run: |
           # Clone the k8s-repo repository
           git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
           
-          # Fetch the version passed from the previous step (environment variable VERSION)
-          VERSION=${{ env.VERSION }}
-          
-          # Update the image version in manifest.yaml
+          # Replace the image version in manifest.yaml with the extracted version
           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
-      
+          
+          # Extract and display the updated version
+          UPDATED_VERSION=$(grep "image: manisankardivi/new:" manifest.yaml | sed -E "s|.*manisankardivi/new:||")
+          echo "Image Updated version: $UPDATED_VERSION"
+          
           # Check if the file has been modified
           git status
           git diff
-        
+  
       - name: Check for changes and commit if updated
         run: |
           cd k8s-repo
           
-          # Fetch the version passed from the previous step (environment variable VERSION)
-          VERSION=${{ env.VERSION }}
-      
           # Check if there are any changes in the manifest file
           if git diff --exit-code --quiet; then
             echo "Version Not Updated"  # No changes to commit, version is still the same
           else
             echo "Version Updated"  # Version was updated
-      
+          
             # Stage the changes to manifest.yaml
             git add manifest.yaml
-      
+          
             # Commit and push the changes to the repository
             git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
             git push origin main
-          fi
+          
+        
