@@ -39,9 +39,7 @@ jobs:
 
       - name: Build the application
         run: |
-          mkdir -p dist
-          go build -o dist/main ./...
-
+          go build 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
