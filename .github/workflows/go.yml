@@ -117,7 +117,9 @@ jobs:
   
       - name: Check for changes and commit if updated
         run: |
-          cd k8s-repo
+          pwd
+          git config --global user.email "manisankar-divi@gmail.com"
+          git config --global user.name "manisankar-divi"
           
           # Check if there are any changes in the manifest file
           if git diff --exit-code --quiet; then
