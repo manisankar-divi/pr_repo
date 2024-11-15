@@ -20,35 +20,27 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.2'
-
-      - name: Install dependencies
-        run: |
-          go install
-          go download
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/.go/pkg/mod
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-mod-
           
-      - name: Test with the Go CLI
+      # Get dependencies (including test dependencies)
+      - name: Get dependencies
         run: |
-          go mod verify
-          go mod download
-          go test -v ./...
-          go get -v -t ./...
+          go get -v ./...  # Download dependencies
+
+      # Install dependencies (if needed)
+      - name: Install dependencies
+        run: go mod tidy  # Ensure that dependencies are tidy
+
+      # Run tests
+      - name: Run tests
+        run: go test -v ./...
 
 
+      # Build Go
       - name: Build the application
         run: |
           go build -v ./...
 
-          
+      # upload Artifact  
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -62,10 +54,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}} # Only required for Organizations, not personal accounts.
-      
+
+      # Install Docker-setup
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Docker login
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
