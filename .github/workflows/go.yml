@@ -23,12 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          go mod download
+          go get -v -t -d ./...
           go install
-
-      - name: Install dependencies
-        run: |
-          go mod tidy
 
       - name: Cache Go modules
         uses: actions/cache@v4
@@ -42,6 +38,8 @@ jobs:
           
       - name: Test with the Go CLI
         run: |
+          go mod verify
+          go mod download
           go test -v ./...
 
       - name: Build the application
