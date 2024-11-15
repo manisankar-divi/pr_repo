@@ -92,25 +92,37 @@ jobs:
 
       - name: Checkout Kubernetes repo
         run: |
+          # Clone the k8s-repo repository
           git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
+          
+          # Fetch the version passed from the previous step (environment variable VERSION)
+          VERSION=${{ env.VERSION }}
+          
+          # Update the image version in manifest.yaml
+          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
       
-          # Update image in manifest.yaml
-          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:${{ env.VERSION }}|" manifest.yaml
-      
-          # Verify changes
+          # Check if the file has been modified
           git status
           git diff
+        
+      - name: Check for changes and commit if updated
+        run: |
+          cd k8s-repo
+          
+          # Fetch the version passed from the previous step (environment variable VERSION)
+          VERSION=${{ env.VERSION }}
       
-          # Configure Git
-          git config --global user.email "manisankar-divi@gmail.com"
-          git config --global user.name "manisankar-divi"
-      
-          # Commit and push changes if there’s an update
+          # Check if there are any changes in the manifest file
           if git diff --exit-code --quiet; then
-            echo "No changes to commit."
+            echo "Not Updated"  # No changes to commit, version is still the same
           else
+            echo "Updated"  # Version was updated
+      
+            # Stage the changes to manifest.yaml
             git add manifest.yaml
-            git commit -m "Updated manifest.yaml with version ${{ env.VERSION }} | GitHub Actions Pipeline"
+      
+            # Commit and push the changes to the repository
+            git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
             git push origin main
           fi
