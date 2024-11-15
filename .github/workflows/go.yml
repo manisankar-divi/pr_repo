@@ -115,9 +115,9 @@ jobs:
       
           # Check if there are any changes in the manifest file
           if git diff --exit-code --quiet; then
-            echo "Not Updated"  # No changes to commit, version is still the same
+            echo "Version Not Updated"  # No changes to commit, version is still the same
           else
-            echo "Updated"  # Version was updated
+            echo "Version Updated"  # Version was updated
       
             # Stage the changes to manifest.yaml
             git add manifest.yaml
