@@ -50,7 +50,7 @@ jobs:
       - name: Checking artifact 
         run: |
           pwd
-          ls 
+          ls -la
           
       # checking Gitleaks 
       - uses: gitleaks/gitleaks-action@v2
