@@ -127,7 +127,7 @@ jobs:
           git config --global user.name "manisankar-divi"
           
           # Stage the changes to manifest.yaml explicitly
-          git add anifest.yaml
+          git add manifest.yaml
           
           # Check if there are any changes in the manifest file
           if git diff --cached --exit-code --quiet; then
