@@ -130,9 +130,9 @@ jobs:
           
           # Check if there are any changes in the manifest file
           if git diff --cached --exit-code --quiet; then
-            echo "Version Not Updated"  # No changes to commit, version is still the same
+            echo "=====> Version Not Updated"  # No changes to commit, version is still the same
           else
-            echo "Version Updated"  # Version was updated
+            echo "=====> Version Updated"  # Version was updated
             
             # Commit the changes
             git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
