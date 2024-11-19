@@ -143,3 +143,22 @@ jobs:
             # Push the changes to the repository
             git push origin main
           fi
+  create_pull_request:
+    runs-on: ubuntu-latest
+    needs: k8s-manifest-files_update  # Only run after Kubernetes manifest is updated
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Open PR
+        id: open_pr
+        uses: rematocorp/open-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          from-branch: staging
+          to-branch: main
+          repository-owner: manisankar-divi
+          repository: go-project
+          
+      - name: Echo mergeable PR number
+        run: echo ${{ steps.open_pr.outputs.pull_number }}
