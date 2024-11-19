@@ -86,94 +86,95 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t manisankardivi/new:${{ env.VERSION }} .
-          docker push manisankardivi/new:${{ env.VERSION }}
+          # docker push manisankardivi/new:${{ env.VERSION }}
 
-  # Update Kubernetes manifest file with the new image version
-  k8s-manifest-files_update:
-    runs-on: ubuntu-latest
-    needs: docker_build_push  # Manifest update only runs after Docker image is pushed
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#   # Update Kubernetes manifest file with the new image version
+#   k8s-manifest-files_update:
+#     runs-on: ubuntu-latest
+#     needs: docker_build_push  # Manifest update only runs after Docker image is pushed
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Read version from VERSION file
-        run: |
-          # Read the version from the VERSION file
-          VERSION=$(cat VERSION)
-          echo "Version extracted: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
+#       - name: Read version from VERSION file
+#         run: |
+#           # Read the version from the VERSION file
+#           VERSION=$(cat VERSION)
+#           echo "Version extracted: $VERSION"
+#           echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save version to environment variable
   
-      - name: Checkout Kubernetes repo
-        run: |
-          # Clone the k8s-repo repository
-          git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
-          cd k8s-repo
+#       - name: Checkout Kubernetes repo
+#         run: |
+#           # Clone the k8s-repo repository
+#           git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
+#           cd k8s-repo
           
-          # Replace the image version in manifest.yaml with the extracted version
-          sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
+#           # Replace the image version in manifest.yaml with the extracted version
+#           sed -i "s|image: manisankardivi/new:.*|image: manisankardivi/new:$VERSION|" manifest.yaml
           
-          # Display the image section (line containing image: manisankardivi/new:)
-          echo "Image Section:"
-          grep "image: manisankardivi/new:" manifest.yaml
+#           # Display the image section (line containing image: manisankardivi/new:)
+#           echo "Image Section:"
+#           grep "image: manisankardivi/new:" manifest.yaml
           
-          # Ensure we are in the correct directory
-          echo "Current working directory: $(pwd)"
+#           # Ensure we are in the correct directory
+#           echo "Current working directory: $(pwd)"
           
-          # Check for any changes in the file and commit if there are updates
-          git status
-          git diff
+#           # Check for any changes in the file and commit if there are updates
+#           git status
+#           git diff
   
-      - name: Check for changes and commit if updated
-        run: |
-          cd k8s-repo
+#       - name: Check for changes and commit if updated
+#         run: |
+#           cd k8s-repo
           
-          # Configure Git with user info
-          git config --global user.email "manisankar-divi@gmail.com"
-          git config --global user.name "manisankar-divi"
+#           # Configure Git with user info
+#           git config --global user.email "manisankar-divi@gmail.com"
+#           git config --global user.name "manisankar-divi"
           
-          # Stage the changes to manifest.yaml explicitly
-          git add manifest.yaml
+#           # Stage the changes to manifest.yaml explicitly
+#           git add manifest.yaml
           
-          # Check if there are any changes in the manifest file
-          if git diff --cached --exit-code --quiet; then
-            echo "Version Not Updated"  # No changes to commit, version is still the same
-          else
-            echo "Version Updated"  # Version was updated
+#           # Check if there are any changes in the manifest file
+#           if git diff --cached --exit-code --quiet; then
+#             echo "Version Not Updated"  # No changes to commit, version is still the same
+#           else
+#             echo "Version Updated"  # Version was updated
             
-            # Commit the changes
-            git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
+#             # Commit the changes
+#             git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
             
-            # Push the changes to the repository
-            git push origin main
-          fi
+#             # Push the changes to the repository
+#             git push origin main
+#           fi
 
-  create_pull_request:
-    runs-on: ubuntu-latest
-    needs: k8s-manifest-files_update  # Only run after Kubernetes manifest is updated
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#   create_pull_request:
+#     runs-on: ubuntu-latest
+#     needs: k8s-manifest-files_update  # Only run after Kubernetes manifest is updated
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Check if there are new commits between staging and main
-        run: |
-          git fetch origin
-          if git rev-list --count origin/main..origin/staging | grep -q '^[1-9][0-9]*$'; then
-            echo "New commits found, proceeding with PR creation."
-          else
-            echo "No new commits between staging and main, skipping PR creation."
-            exit 0
-          fi
+#       - name: Check if there are new commits between staging and main
+#         run: |
+#           git fetch origin
+#           if git rev-list --count origin/main..origin/staging | grep -q '^[1-9][0-9]*$'; then
+#             echo "New commits found, proceeding with PR creation."
+#           else
+#             echo "No new commits between staging and main, skipping PR creation."
+#             exit 0
+#           fi
 
-      - name: Open PR
-        id: open_pr
-        uses: rematocorp/open-pull-request-action@v1
-        with:
-          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          from-branch: staging
-          to-branch: main
-          repository-owner: manisankar-divi
-          repository: go-project
+#       - name: Open PR
+#         id: open_pr
+#         uses: rematocorp/open-pull-request-action@v1
+#         with:
+#           github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#           from-branch: staging
+#           to-branch: main
+#           repository-owner: manisankar-divi
+#           repository: go-project
 
-      - name: Echo mergeable PR number
-        run: echo ${{ steps.open_pr.outputs.pull_number }}
-## this is soubarniya 
+#       - name: Echo mergeable PR number
+#         run: echo ${{ steps.open_pr.outputs.pull_number }}
+# ## this is soubarniya 
+# #hello
