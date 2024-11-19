@@ -137,7 +137,7 @@ jobs:
             echo "=====> Version Updated"  # Version was updated
             
             # Commit the changes
-            git commit -m "Updated manifest.yaml with version $VERSION | GitHub Actions Pipeline"
+            git commit -m "Updated anifest.yaml with version $VERSION | GitHub Actions Pipeline"
             
             # Push the changes to the repository
             git push origin main
