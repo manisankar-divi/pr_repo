@@ -1,4 +1,4 @@
-name: Staging-CI_Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -139,6 +139,13 @@ jobs:
           fi
 
       # Optionally push a PR to main
+  Pull_request:
+    runs-on: ubuntu-latest
+    needs: k8s-manifest-files_update  # Docker build & push only runs after build succeeds
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Create Pull Request to Main
         if: success()
         uses: peter-evans/create-pull-request@v5
