@@ -102,7 +102,7 @@ jobs:
       - name: Checkout Kubernetes repo
         run: |
           # Clone the k8s-repo repository
-          git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
+          git clonre https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/manisankar-divi/k8s-repo.git
           cd k8s-repo
           
           # Replace the image version in manifest.yaml with the extracted version
