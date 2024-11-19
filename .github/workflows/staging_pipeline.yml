@@ -154,7 +154,7 @@ jobs:
         id: open_pr
         uses: rematocorp/open-pull-request-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           from-branch: staging
           to-branch: main
           repository-owner: manisankar-divi
