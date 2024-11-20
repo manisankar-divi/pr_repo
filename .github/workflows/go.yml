@@ -149,7 +149,7 @@ jobs:
 
   create_pull_request:
     runs-on: ubuntu-latest
-    needs: k8s-manifest-files_update  # Only run after Kubernetes manifest is updated
+    # needs: k8s-manifest-files_update  # Only run after Kubernetes manifest is updated
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
