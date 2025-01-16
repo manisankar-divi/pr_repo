@@ -24,3 +24,4 @@ COPY --from=builder /app/myapp /myapp
 
 # Command to run the application
 CMD ["/myapp"]
+# new code will write soon
